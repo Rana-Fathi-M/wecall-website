@@ -37,7 +37,7 @@ export function Services() {
   return (
     <section ref={root} id="services" className="relative overflow-hidden bg-ink py-14 md:py-24">
       <img
-        src="/media/wire-building.png"
+        src="/assets/images/wire-building.png"
         alt=""
         className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-40"
       />

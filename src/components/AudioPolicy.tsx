@@ -66,7 +66,7 @@ export function AudioPolicy() {
     <section ref={root} className="ap-sec relative overflow-hidden bg-ink px-3 py-16 md:px-6 md:py-28">
       <audio
         ref={audioRef}
-        src="/media/elite-roster-invite.wav?v=10"
+        src="/assets/audio/elite-roster-invite.wav?v=10"
         preload="auto"
         playsInline
         onEnded={() => markRosterEnded()}

@@ -26,7 +26,7 @@ export function ServicesPage() {
 
       <section className="relative overflow-hidden bg-ink py-14 text-white md:py-28">
         <img
-          src="/media/wire-building.png"
+          src="/assets/images/wire-building.png"
           alt=""
           className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-30"
         />

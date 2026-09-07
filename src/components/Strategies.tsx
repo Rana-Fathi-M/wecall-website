@@ -78,10 +78,10 @@ export function Strategies() {
                 </span>
                 <span className="flex gap-1.5 md:gap-2">
                   <span className="st-card-icon">
-                    <img src="/media/cube.svg" alt="" className="h-3.5 w-3.5" />
+                    <img src="/assets/icons/cube.svg" alt="" className="h-3.5 w-3.5" />
                   </span>
                   <span className="st-card-icon">
-                    <img src="/media/building.svg" alt="" className="h-4 w-3" />
+                    <img src="/assets/icons/building.svg" alt="" className="h-4 w-3" />
                   </span>
                 </span>
               </div>

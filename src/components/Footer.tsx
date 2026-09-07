@@ -89,9 +89,9 @@ export function Footer() {
       </p>
 
       <div className="ft-copy mt-8 flex justify-center gap-5 md:mt-12 md:gap-6">
-        <Social href="#" src="/media/linkedin.svg" label="LinkedIn" />
-        <Social href="#" src="/media/facebook.svg" label="Facebook" />
-        <Social href="#" src="/media/instagram.svg" label="Instagram" />
+        <Social href="#" src="/assets/icons/linkedin.svg" label="LinkedIn" />
+        <Social href="#" src="/assets/icons/facebook.svg" label="Facebook" />
+        <Social href="#" src="/assets/icons/instagram.svg" label="Instagram" />
       </div>
 
       <div className="ft-legal mx-auto mt-8 grid max-w-5xl grid-cols-2 items-center gap-3 border-t border-white/10 pt-5 font-manrope text-[10px] tracking-widest text-white/40 uppercase md:mt-16 md:flex md:justify-between md:pt-6 md:text-[11px]">

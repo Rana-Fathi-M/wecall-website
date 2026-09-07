@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
-  armSectionPlay,
   markRosterEnded,
   onRosterPlaying,
   registerRosterAudio,
@@ -46,12 +45,6 @@ export function AudioPolicy() {
         });
       });
 
-      ScrollTrigger.create({
-        trigger: root.current,
-        start: "top 80%",
-        onEnter: () => armSectionPlay(),
-        onEnterBack: () => armSectionPlay(),
-      });
     }, root);
 
     const offPlaying = onRosterPlaying(setPlaying);

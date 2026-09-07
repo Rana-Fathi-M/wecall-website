@@ -1,25 +1,54 @@
-import { useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { useLenis } from "../hooks/useLenis";
 import { Header } from "./Header";
 import { Menu } from "./Menu";
 import { Footer } from "./Footer";
-import { useEffect } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { armVoiceUnlock } from "../lib/voiceUnlock";
+import { scrollToTop } from "../lib/smoothScroll";
 
 export function Layout() {
   const [menu, setMenu] = useState(false);
   const location = useLocation();
   useLenis();
-  useEffect(() => {
-    armVoiceUnlock();
-  }, []);
+
+  useLayoutEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+    scrollToTop(false);
+    const timer = window.setTimeout(() => {
+      scrollToTop(false);
+      requestAnimationFrame(() => ScrollTrigger.refresh());
+    }, 40);
+    const late = window.setTimeout(() => scrollToTop(false), 160);
+    return () => {
+      window.clearTimeout(timer);
+      window.clearTimeout(late);
+    };
+  }, [location.pathname, location.key]);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-    requestAnimationFrame(() => ScrollTrigger.refresh());
-  }, [location.pathname]);
+    const onNavClick = (event: MouseEvent) => {
+      const link = (event.target as HTMLElement | null)?.closest("a");
+      if (!link || link.target === "_blank") return;
+      const href = link.getAttribute("href");
+      if (
+        !href ||
+        href === "#" ||
+        href.startsWith("#") ||
+        href.startsWith("mailto:") ||
+        href.startsWith("tel:")
+      ) {
+        return;
+      }
+      const url = new URL(href, window.location.href);
+      if (url.origin !== window.location.origin) return;
+      scrollToTop(false);
+    };
+    document.addEventListener("click", onNavClick, true);
+    return () => document.removeEventListener("click", onNavClick, true);
+  }, []);
 
   return (
     <div className="theme-page min-h-screen">

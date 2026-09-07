@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { scrollToTop } from "../lib/smoothScroll";
 
 type Props = {
   to?: string;
@@ -42,7 +43,14 @@ export function ClaimSeatCta({
   }
 
   return (
-    <Link to={to} className={classes} onClick={onClick}>
+    <Link
+      to={to}
+      className={classes}
+      onClick={() => {
+        onClick?.();
+        scrollToTop(false);
+      }}
+    >
       {inner}
     </Link>
   );

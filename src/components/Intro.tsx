@@ -52,8 +52,8 @@ export function Intro() {
         ease: "none",
         scrollTrigger: {
           trigger: root.current,
-          start: "top center",
-          end: "top top",
+          start: mobile ? "top 80%" : "top center",
+          end: mobile ? "top 18%" : "top top",
           scrub: 1,
           invalidateOnRefresh: true,
         },

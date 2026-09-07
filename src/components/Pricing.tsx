@@ -237,28 +237,28 @@ export function Pricing() {
           : "Month-to-month. Switch to annual to hold today’s rate."}
       </p>
 
-      <div className="pr-cards relative z-10 mx-auto mt-10 grid max-w-6xl grid-cols-1 gap-4 md:mt-14 md:grid-cols-3 md:gap-5">
+      <div className="pr-cards relative z-10 mx-auto mt-10 grid max-w-6xl grid-cols-3 gap-1.5 md:mt-14 md:gap-5">
         {tiers.map((t, i) => (
           <article
             key={t.name}
-            className={`pr-card keep-dark flex h-full min-w-0 flex-col rounded-2xl border p-5 text-white md:p-7 ${
+            className={`pr-card keep-dark flex h-full min-w-0 flex-col rounded-2xl border p-2 text-white md:p-7 ${
               t.featured
                 ? "pr-featured border-gold bg-gradient-to-b from-[#56423f] to-[#191d23]"
                 : "border-white/10 bg-[#1f2329]"
             }`}
           >
-            <div className="flex items-center justify-between gap-3">
-              <p className={`font-manrope text-[12px] font-bold tracking-[0.18em] uppercase ${t.featured ? "text-gold" : "text-white/60"}`}>
+            <div className="flex items-start justify-between gap-1 md:items-center md:gap-3">
+              <p className={`pr-tag font-manrope text-[7px] font-bold tracking-[0.08em] uppercase md:text-[12px] md:tracking-[0.18em] ${t.featured ? "text-gold" : "text-white/60"}`}>
                 {t.tag}
               </p>
               {t.featured && <span className="pr-badge-float">Most chosen</span>}
             </div>
 
-            <h3 className="mt-4 font-nohemi text-[30px] leading-[1.05] font-semibold md:text-[38px]">
+            <h3 className="mt-2 font-nohemi text-[12px] leading-[1.05] font-semibold md:mt-4 md:text-[38px]">
               {t.name}
             </h3>
 
-            <div className="mt-4 border-b border-white/10 pb-5">
+            <div className="mt-2 border-b border-white/10 pb-2 md:mt-4 md:pb-5">
               {i < 2 ? (
                 <FlipPrice
                   value={cycle === "monthly" ? monthly[i] : annual[i]}
@@ -266,23 +266,23 @@ export function Pricing() {
                   featured={t.featured}
                 />
               ) : (
-                <p className="pr-price font-nohemi text-[36px] leading-none text-gold md:text-[44px]">Dynamic</p>
+                <p className="pr-price font-nohemi text-[16px] leading-none text-gold md:text-[44px]">Dynamic</p>
               )}
-              <p className="mt-2 font-manrope text-[12px] text-gold/80">{t.seats}</p>
+              <p className="mt-1 font-manrope text-[8px] text-gold/80 md:mt-2 md:text-[12px]">{t.seats}</p>
             </div>
 
-            <p className="pr-intro mt-5 font-manrope text-[15px] leading-relaxed font-medium text-white/85">{t.intro}</p>
+            <p className="pr-intro mt-2 font-manrope text-[8px] leading-snug font-medium text-white/85 md:mt-5 md:text-[15px] md:leading-relaxed">{t.intro}</p>
 
-            <ul className="pr-points mt-5 flex-1 space-y-3 font-manrope text-[15px] font-medium text-white/80">
+            <ul className="pr-points mt-2 flex-1 space-y-1 font-manrope text-[8px] font-medium text-white/80 md:mt-5 md:space-y-3 md:text-[15px]">
               {t.points.map((p) => (
-                <li key={p} className="flex items-start gap-2.5">
+                <li key={p} className="flex items-start gap-1 md:gap-2.5">
                   <span className="mt-0.5 text-gold">✓</span>
                   <span className="leading-snug">{p}</span>
                 </li>
               ))}
             </ul>
 
-            <ClaimSeatCta wide className="mt-7" />
+            <ClaimSeatCta wide className="pr-card-cta mt-3 md:mt-7" />
           </article>
         ))}
       </div>
@@ -342,11 +342,11 @@ function FlipPrice({
   }, [value]);
 
   return (
-    <p className={`pr-price font-nohemi text-[48px] leading-none font-semibold md:text-[58px] ${featured ? "text-white" : "text-gold"}`}>
+    <p className={`pr-price font-nohemi text-[16px] leading-none font-semibold md:text-[58px] ${featured ? "text-white" : "text-gold"}`}>
       <span ref={ref} data-val={String(value)}>
         ${value.toLocaleString()}
       </span>
-      <span className="ml-1 block font-manrope text-[12px] font-medium text-white/45 md:inline md:text-[15px]">
+      <span className="ml-0 mt-0.5 block font-manrope text-[8px] font-medium text-white/45 md:mt-0 md:ml-1 md:inline md:text-[15px]">
         {suffix}
       </span>
     </p>

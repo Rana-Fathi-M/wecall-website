@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { BrandLogo } from "./BrandLogo";
 import { ClaimSeatCta } from "./ClaimSeatCta";
+import { scrollToTop } from "../lib/smoothScroll";
 
 const items = [
   { label: "Home", href: "/" },
@@ -72,7 +73,13 @@ export function Menu({ open, onClose }: Props) {
 
       <div className="mn-panel relative flex h-full w-full flex-col px-5 pt-5 pb-4 md:px-10 md:pt-8 md:pb-6">
         <div className="flex w-full items-center justify-between pr-14 md:pr-16">
-          <Link to="/" onClick={onClose}>
+          <Link
+            to="/"
+            onClick={() => {
+              onClose();
+              scrollToTop(false);
+            }}
+          >
             <BrandLogo className="h-9 w-auto md:h-14" />
           </Link>
           <button type="button" onClick={onClose} className="mn-close" aria-label="Close menu">
@@ -90,7 +97,10 @@ export function Menu({ open, onClose }: Props) {
               <Link
                 key={item.href}
                 to={item.href}
-                onClick={onClose}
+                onClick={() => {
+                  onClose();
+                  scrollToTop(false);
+                }}
                 onMouseEnter={() => setActive(i)}
                 className={`mn-item overflow-hidden font-nohemi font-medium tracking-[-0.02em] uppercase ${
                   i === active ? "text-gold" : ""

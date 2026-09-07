@@ -3,6 +3,7 @@ import Lenis from "lenis";
 import "lenis/dist/lenis.css";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { setLenis } from "../lib/smoothScroll";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -13,6 +14,7 @@ export function useLenis() {
       smoothWheel: true,
     });
 
+    setLenis(lenis);
     lenis.on("scroll", ScrollTrigger.update);
 
     const ticker = (time: number) => {
@@ -25,6 +27,7 @@ export function useLenis() {
 
     return () => {
       gsap.ticker.remove(ticker);
+      setLenis(null);
       lenis.destroy();
     };
   }, []);

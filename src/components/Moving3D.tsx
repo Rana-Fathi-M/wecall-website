@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { asset } from "../media";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -31,7 +32,7 @@ export function Moving3D() {
     <section ref={root} className="keep-dark relative z-[2] overflow-hidden bg-[#2a2a2a]">
       <video
         className="move3d-video block h-[72vh] w-full object-cover object-[center_82%] md:h-[86vh]"
-        src="/assets/videos/moving-3d.mp4"
+        src={asset("assets/videos/moving-3d.mp4")}
         autoPlay
         muted
         loop

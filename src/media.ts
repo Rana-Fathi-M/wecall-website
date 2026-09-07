@@ -1,4 +1,7 @@
-const img = (file: string) => `/assets/images/${file}`;
+export const asset = (path: string) =>
+  `${import.meta.env.BASE_URL}${path.replace(/^\//, "")}`;
+
+const img = (file: string) => asset(`assets/images/${file}`);
 
 export const photos = {
   desks: { light: img("intro-desks.png"), dark: img("cream-desks.png") },

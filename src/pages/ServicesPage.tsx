@@ -1,9 +1,9 @@
-import { Link } from "react-router-dom";
 import { services } from "../data";
 import { Workflow } from "../components/Workflow";
 import { AudioPolicy } from "../components/AudioPolicy";
 import { ThemePhoto } from "../components/ThemePhoto";
-import { photos } from "../media";
+import { asset, photos } from "../media";
+import { ClaimSeatCta } from "../components/ClaimSeatCta";
 
 export function ServicesPage() {
   return (
@@ -26,7 +26,7 @@ export function ServicesPage() {
 
       <section className="relative overflow-hidden bg-ink py-14 text-white md:py-28">
         <img
-          src="/assets/images/wire-building.png"
+          src={asset("assets/images/wire-building.png")}
           alt=""
           className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-30"
         />
@@ -53,12 +53,7 @@ export function ServicesPage() {
           ))}
         </div>
         <div className="relative z-[2] mt-14 text-center">
-          <Link
-            to="/apply"
-            className="inline-flex rounded-full bg-brown px-7 py-3 font-manrope text-[12px] tracking-wide text-white uppercase"
-          >
-            Apply for Strategic Call
-          </Link>
+          <ClaimSeatCta />
         </div>
       </section>
 

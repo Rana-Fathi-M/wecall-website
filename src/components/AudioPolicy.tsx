@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
@@ -10,6 +9,8 @@ import {
   requestRosterPlay,
   stopRosterPlay,
 } from "../lib/voiceUnlock";
+import { ClaimSeatCta } from "./ClaimSeatCta";
+import { asset } from "../media";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -66,7 +67,7 @@ export function AudioPolicy() {
     <section ref={root} className="ap-sec relative overflow-hidden bg-ink px-3 py-16 md:px-6 md:py-28">
       <audio
         ref={audioRef}
-        src="/assets/audio/elite-roster-invite.wav?v=10"
+        src={`${asset("assets/audio/elite-roster-invite.wav")}?v=10`}
         preload="auto"
         playsInline
         onEnded={() => markRosterEnded()}
@@ -121,11 +122,7 @@ export function AudioPolicy() {
           </div>
         </div>
 
-        <Link to="/apply" className="ap-cta hero-cta-primary mt-8 inline-flex md:mt-10">
-          <span className="hero-cta-shine" />
-          Schedule Private Voice Audit
-          <em>&amp; strategy call</em>
-        </Link>
+        <ClaimSeatCta className="ap-cta mt-8 md:mt-10" />
       </div>
     </section>
   );

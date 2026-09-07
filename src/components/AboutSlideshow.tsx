@@ -4,6 +4,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { photos } from "../media";
 import { ThemePhoto } from "./ThemePhoto";
+import { ClaimSeatCta } from "./ClaimSeatCta";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -108,26 +109,12 @@ export function AboutSlideshow() {
             </span>
           </div>
 
-          <div className="relative z-10 grid w-full grid-cols-2 items-end gap-3 px-3 pb-10 md:flex md:flex-row md:justify-between md:gap-8 md:px-10 md:pb-20">
+          <div className="relative z-10 grid w-full grid-cols-2 items-end gap-3 px-3 pb-4 md:flex md:flex-row md:justify-between md:gap-8 md:px-10 md:pb-8">
             <div className="min-w-0 md:max-w-xl">
               <h2 className="font-nohemi text-[22px] leading-[0.95] font-medium md:text-[64px]">{p.title}</h2>
               <p className="mt-2 font-manrope text-[12px] leading-snug text-white/70 md:mt-4 md:text-[16px] md:leading-relaxed">
                 {p.copy}
               </p>
-              <div className="mt-4 flex gap-2 md:mt-8 md:gap-3">
-                <Link
-                  to={p.href}
-                  className="min-h-[44px] flex-1 rounded-full bg-gold px-2 py-2 text-center font-manrope text-[8px] font-bold tracking-widest text-ink uppercase md:min-h-0 md:flex-none md:px-7 md:py-3 md:text-[10px]"
-                >
-                  {p.cta}
-                </Link>
-                <Link
-                  to="/pricing"
-                  className="min-h-[44px] flex-1 rounded-full border border-white/25 bg-white/10 px-2 py-2 text-center font-manrope text-[8px] font-bold tracking-widest text-white uppercase backdrop-blur-md md:min-h-0 md:flex-none md:px-7 md:py-3 md:text-[10px]"
-                >
-                  Build Your Custom Desk
-                </Link>
-              </div>
             </div>
             <div className="min-w-0 text-right">
               <p className="font-manrope text-[9px] tracking-[0.18em] text-white/40 uppercase md:text-[10px]">
@@ -135,6 +122,12 @@ export function AboutSlideshow() {
               </p>
               <p className="mt-1 font-nohemi text-[28px] leading-none text-gold md:text-[72px]">{p.metric}</p>
             </div>
+          </div>
+          <div className="relative z-10 flex w-full flex-col items-stretch gap-3 px-3 pb-10 md:flex-row md:items-center md:px-10 md:pb-20">
+            <ClaimSeatCta />
+            <Link to="/pricing" className="hero-cta-ghost">
+              Build Your Custom Desk
+            </Link>
           </div>
         </section>
       ))}

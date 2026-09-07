@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { steps } from "../data";
+import { ClaimSeatCta } from "./ClaimSeatCta";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -71,11 +71,7 @@ export function Workflow() {
       </div>
 
       <div className="mt-16 text-center">
-        <Link to="/apply" className="hero-cta-primary inline-flex">
-          <span className="hero-cta-shine" />
-          Start My Desk in 48 Hours
-          <em>Apply for allocation</em>
-        </Link>
+        <ClaimSeatCta />
       </div>
     </section>
   );

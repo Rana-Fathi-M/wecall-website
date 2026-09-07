@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
 import { BrandLogo } from "./BrandLogo";
+import { ClaimSeatCta } from "./ClaimSeatCta";
 
 type Props = {
   onOpenMenu: () => void;
@@ -46,10 +47,7 @@ export function Header({ onOpenMenu }: Props) {
 
         <div className="nav-side nav-side-right">
           <ThemeToggle />
-          <Link to="/apply" className="nav-cta">
-            <span className="nav-cta-shine" />
-            Claim Seat
-          </Link>
+          <ClaimSeatCta compact />
         </div>
       </div>
     </header>

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { BrandLogo } from "./BrandLogo";
+import { ClaimSeatCta } from "./ClaimSeatCta";
 
 const items = [
   { label: "Home", href: "/" },
@@ -101,6 +102,10 @@ export function Menu({ open, onClose }: Props) {
               </Link>
             ))}
           </nav>
+        </div>
+
+        <div className="mt-4 md:mt-6">
+          <ClaimSeatCta wide onClick={onClose} />
         </div>
 
         <div className="mt-4 grid grid-cols-2 gap-3 border-t border-gold/20 pt-4 font-manrope md:mt-6 md:gap-6 md:pt-5">

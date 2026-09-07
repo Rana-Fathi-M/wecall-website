@@ -1,29 +1,5 @@
 @import "tailwindcss";
 
-@font-face {
-  font-family: "Nohemi";
-  src: url("/fonts/Nohemi-ExtraLight.otf") format("opentype");
-  font-weight: 200;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Nohemi";
-  src: url("/fonts/Nohemi-Light.otf") format("opentype");
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Mariyam";
-  src: url("/fonts/Mariyam.otf") format("opentype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
 @theme {
   --color-ink: #191d23;
   --color-grey: #343434;
@@ -267,24 +243,42 @@ html.light .nav-theme {
   position: relative;
   overflow: hidden;
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 42px;
-  padding: 0 22px;
+  min-height: 0;
+  padding: 8px 18px 7px;
   border-radius: 999px;
-  background: linear-gradient(135deg, #e3c4a0 0%, #c49e7b 48%, #a78463 100%);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.32) 0%, transparent 46%),
+    linear-gradient(118deg, #f0d7b8 0%, #d8b48a 34%, #c49e7b 64%, #9a7352 100%);
   font-family: Manrope, sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  line-height: 1.15;
   text-transform: uppercase;
+  text-align: center;
   color: #191d23;
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.22) inset,
-    0 10px 24px rgba(196, 158, 123, 0.35);
+    0 0 0 1px rgba(255, 255, 255, 0.38) inset,
+    0 10px 24px rgba(196, 158, 123, 0.42);
   transition:
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.35s ease;
+}
+
+.nav-cta .cta-line {
+  max-width: 148px;
+}
+
+.nav-cta em {
+  margin-top: 2px;
+  font-style: normal;
+  font-size: 7px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: rgba(25, 29, 35, 0.68);
 }
 
 .nav-cta-shine {
@@ -367,9 +361,19 @@ html.light .nav-theme {
   }
 
   .nav-cta {
-    min-height: 36px;
-    padding: 0 12px;
-    font-size: 10px;
+    min-height: 0;
+    padding: 6px 10px 5px;
+    font-size: 7px;
+    letter-spacing: 0.06em;
+  }
+
+  .nav-cta .cta-line {
+    max-width: 92px;
+  }
+
+  .nav-cta em {
+    font-size: 6px;
+    letter-spacing: 0.1em;
   }
 }
 
@@ -648,35 +652,78 @@ html.light .plus-circle-track {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-width: 260px;
+  min-width: min(100%, 380px);
   border-radius: 999px;
-  background: linear-gradient(135deg, #d4b089 0%, #a78463 48%, #c49e7b 100%);
-  padding: 16px 34px 14px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.34) 0%, transparent 44%),
+    linear-gradient(118deg, #f0d7b8 0%, #d8b48a 32%, #c49e7b 62%, #9a7352 100%);
+  padding: 22px 48px 18px;
   font-family: Manrope, sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1.15;
   text-transform: uppercase;
+  text-align: center;
   color: #191d23;
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.18) inset,
-    0 12px 20px rgba(196, 158, 123, 0.45);
+    0 0 0 1px rgba(255, 255, 255, 0.4) inset,
+    0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 18px 40px rgba(196, 158, 123, 0.52),
+    0 6px 16px rgba(87, 62, 40, 0.28);
+  animation: ctaGlow 2.8s ease-in-out infinite;
   transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
 
+.hero-cta-wide {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+}
+
+.hero-cta-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 8px 20px;
+}
+
 .hero-cta-primary em {
-  margin-top: 3px;
+  margin-top: 5px;
   font-style: normal;
-  font-size: 10px;
-  letter-spacing: 0.22em;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   color: rgba(25, 29, 35, 0.7);
 }
 
 .hero-cta-primary:hover {
-  transform: scale(1.06);
+  transform: translateY(-2px) scale(1.04);
+  animation: none;
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.28) inset,
-    0 18px 30px rgba(196, 158, 123, 0.65);
+    0 0 0 1px rgba(255, 255, 255, 0.55) inset,
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 24px 48px rgba(196, 158, 123, 0.68),
+    0 8px 20px rgba(87, 62, 40, 0.34);
+}
+
+@keyframes ctaGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.4) inset,
+      0 1px 0 rgba(255, 255, 255, 0.5) inset,
+      0 18px 40px rgba(196, 158, 123, 0.52),
+      0 6px 16px rgba(87, 62, 40, 0.28);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.5) inset,
+      0 1px 0 rgba(255, 255, 255, 0.58) inset,
+      0 22px 52px rgba(196, 158, 123, 0.7),
+      0 8px 22px rgba(87, 62, 40, 0.32);
+  }
 }
 
 .hero-cta-shine {
@@ -903,17 +950,17 @@ html.light .ft-social-draw {
   .hero-cta-primary,
   .hero-cta-ghost {
     min-width: 0;
-    width: auto;
-    flex: 1 1 calc(50% - 6px);
+    width: 100%;
+    flex: none;
     max-width: none;
-    padding: 12px 10px 10px;
-    font-size: 10px;
+    padding: 16px 18px 14px;
+    font-size: 12px;
     letter-spacing: 0.08em;
   }
 
   .hero-cta-primary em {
-    font-size: 8px;
-    letter-spacing: 0.12em;
+    font-size: 9px;
+    letter-spacing: 0.14em;
   }
 }
 
@@ -1719,12 +1766,12 @@ html.light .ap-chip {
 }
 
 .hero-gap {
-  height: 0;
+  height: 24px;
 }
 
 @media (min-width: 1024px) {
   .hero-gap {
-    height: 25vh;
+    height: 48px;
   }
 }
 

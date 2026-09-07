@@ -1,9 +1,9 @@
-import { Link } from "react-router-dom";
 import { strategies } from "../data";
 import { Difference } from "../components/Difference";
 import { Strategies } from "../components/Strategies";
 import { ThemePhoto } from "../components/ThemePhoto";
 import { photos } from "../media";
+import { ClaimSeatCta } from "../components/ClaimSeatCta";
 
 export function StrategiesPage() {
   return (
@@ -54,12 +54,7 @@ export function StrategiesPage() {
       <Difference />
 
       <div className="bg-ink py-16 text-center">
-        <Link
-          to="/apply"
-          className="inline-flex rounded-full bg-brown px-8 py-3 font-manrope text-[12px] tracking-wide text-white uppercase"
-        >
-          Build Your Custom Desk
-        </Link>
+        <ClaimSeatCta />
       </div>
     </main>
   );

@@ -1,9 +1,9 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { pricingRows, stacks, tiers } from "../data";
+import { ClaimSeatCta } from "./ClaimSeatCta";
 
 gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
 
@@ -282,14 +282,7 @@ export function Pricing() {
               ))}
             </ul>
 
-            <Link
-              to="/apply"
-              className={`pr-liquid mt-7 inline-flex w-full items-center justify-center rounded-full px-5 py-3.5 text-center font-manrope text-[13px] font-bold tracking-[0.16em] uppercase ${
-                t.featured ? "" : ""
-              }`}
-            >
-              {t.cta}
-            </Link>
+            <ClaimSeatCta wide className="mt-7" />
           </article>
         ))}
       </div>
@@ -315,12 +308,7 @@ export function Pricing() {
         <p className="min-w-0 font-manrope text-[11px] leading-snug md:text-[13px]">
           2 Upcoming Millionaire seats left at $5,500
         </p>
-        <Link
-          to="/apply"
-          className="shrink-0 rounded-full bg-gold px-4 py-2 font-manrope text-[10px] font-bold tracking-widest text-ink uppercase"
-        >
-          Lock in
-        </Link>
+        <ClaimSeatCta compact className="shrink-0" />
       </div>
     </section>
   );

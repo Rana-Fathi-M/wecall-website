@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { photos } from "../media";
+import { ClaimSeatCta } from "./ClaimSeatCta";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -467,18 +468,14 @@ export function Hero() {
               absolute
               left-1/2
               top-auto
-              bottom-8
+              bottom-10
               z-[110]
               w-[calc(100%-1.5rem)]
               max-w-[720px]
               -translate-x-1/2
-              pb-0
               text-center
-              md:top-[40%]
-              md:bottom-auto
+              md:bottom-12
               md:w-[calc(100%-3rem)]
-              md:pb-10
-              lg:top-[48%]
             "
           >
             <h2
@@ -524,24 +521,9 @@ export function Hero() {
               deliver pre-vetted, highly motivated seller leads.
             </p>
 
-            <div
-              className="
-                mt-5
-                flex
-                flex-col
-                items-center
-                justify-center
-                gap-3
-                md:mt-10
-                md:gap-5
-              "
-            >
-              <div className="flex w-full max-w-[520px] items-stretch justify-center gap-2 sm:w-auto sm:items-center sm:gap-3">
-                <Link to="/apply" className="hero-cta-primary">
-                  <span className="hero-cta-shine" />
-                  Claim Your Investor Seat
-                  <em>2 cohort seats left</em>
-                </Link>
+            <div className="hero-cta-slot mt-5 md:mt-8">
+              <div className="flex w-full max-w-[420px] flex-col items-stretch justify-center gap-3 sm:max-w-[520px] md:w-auto md:max-w-none md:flex-row md:items-center">
+                <ClaimSeatCta />
                 <Link to="/pricing" className="hero-cta-ghost">
                   Build My Custom Desk
                 </Link>

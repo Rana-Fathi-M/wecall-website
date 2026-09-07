@@ -4,6 +4,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { strategies } from "../data";
 import { Moving3D } from "./Moving3D";
 import { ThemePhoto } from "./ThemePhoto";
+import { ClaimSeatCta } from "./ClaimSeatCta";
+import { asset } from "../media";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -47,7 +49,7 @@ export function Strategies() {
 
       <Moving3D />
 
-      <div className="st-grid-wrap relative overflow-hidden py-10 md:py-24">
+      <div className="st-grid-wrap relative overflow-x-clip py-10 md:py-24">
         <div className="overflow-hidden border-y border-white/15 py-4">
           <div className="marquee-track flex w-max font-nohemi text-[28px] font-light text-white uppercase md:text-[88px]">
             {Array.from({ length: 6 }).map((_, i) => (
@@ -65,12 +67,12 @@ export function Strategies() {
           </p>
         </div>
 
-        <div className="st-grid mt-8 grid grid-cols-4 items-stretch gap-2 px-3 pb-2 md:mt-14 md:gap-4 md:px-8">
+        <div className="st-grid mt-8 grid grid-cols-4 items-stretch gap-2 px-3 pb-6 md:mt-14 md:gap-4 md:px-8 md:pb-8">
           {strategies.map((s, i) => (
             <article
               key={s.title}
               data-cursor
-              className="st-card group relative flex h-full min-w-0 flex-col overflow-hidden p-2.5 sm:p-3 md:p-6"
+              className="st-card group relative flex h-full min-w-0 flex-col p-2.5 sm:p-3 md:p-6"
             >
               <div className="mb-3 flex items-center justify-between md:mb-5">
                 <span className="st-card-num font-manrope text-[10px] tracking-[0.22em] uppercase md:text-[11px]">
@@ -78,10 +80,10 @@ export function Strategies() {
                 </span>
                 <span className="flex gap-1.5 md:gap-2">
                   <span className="st-card-icon">
-                    <img src="/assets/icons/cube.svg" alt="" className="h-3.5 w-3.5" />
+                    <img src={asset("assets/icons/cube.svg")} alt="" className="h-3.5 w-3.5" />
                   </span>
                   <span className="st-card-icon">
-                    <img src="/assets/icons/building.svg" alt="" className="h-4 w-3" />
+                    <img src={asset("assets/icons/building.svg")} alt="" className="h-4 w-3" />
                   </span>
                 </span>
               </div>
@@ -109,6 +111,10 @@ export function Strategies() {
               </div>
             </article>
           ))}
+        </div>
+
+        <div className="hero-cta-slot px-3">
+          <ClaimSeatCta />
         </div>
       </div>
     </section>

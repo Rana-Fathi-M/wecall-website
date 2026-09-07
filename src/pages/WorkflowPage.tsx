@@ -1,8 +1,8 @@
-import { Link } from "react-router-dom";
 import { steps } from "../data";
 import { Workflow } from "../components/Workflow";
 import { ThemePhoto } from "../components/ThemePhoto";
 import { photos } from "../media";
+import { ClaimSeatCta } from "../components/ClaimSeatCta";
 
 export function WorkflowPage() {
   return (
@@ -42,12 +42,7 @@ export function WorkflowPage() {
           ))}
         </div>
         <div className="mt-16 text-center">
-          <Link
-            to="/apply"
-            className="inline-flex rounded-full bg-brown px-8 py-3 font-manrope text-[12px] tracking-wide uppercase"
-          >
-            Apply for Strategic Call
-          </Link>
+          <ClaimSeatCta />
         </div>
       </section>
     </main>

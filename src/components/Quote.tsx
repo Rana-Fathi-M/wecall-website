@@ -4,6 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import { sendBookingEmail } from "../lib/sendBookingEmail";
+import { ClaimSeatCta } from "./ClaimSeatCta";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -638,10 +639,13 @@ function BoardroomBooking({
               ) : null}
 
               <div className="qt-submit-bar">
-                <button type="submit" disabled={status === "sending"} className="hero-cta-primary w-full max-w-none disabled:opacity-40">
-                  <span className="hero-cta-shine" />
-                  {status === "sending" ? "Sending brief…" : "Submit Boardroom Brief"}
-                </button>
+                <ClaimSeatCta
+                  type="submit"
+                  wide
+                  disabled={status === "sending"}
+                  className="disabled:opacity-40"
+                  busyLabel={status === "sending" ? "Sending brief…" : undefined}
+                />
               </div>
             </form>
           ) : null}

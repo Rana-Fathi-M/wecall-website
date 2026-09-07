@@ -4,6 +4,8 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { services } from "../data";
 import { ThemePhoto } from "./ThemePhoto";
+import { ClaimSeatCta } from "./ClaimSeatCta";
+import { asset } from "../media";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -37,7 +39,7 @@ export function Services() {
   return (
     <section ref={root} id="services" className="relative overflow-hidden bg-ink py-14 md:py-24">
       <img
-        src="/assets/images/wire-building.png"
+        src={asset("assets/images/wire-building.png")}
         alt=""
         className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-40"
       />
@@ -92,10 +94,7 @@ export function Services() {
       </div>
 
       <div className="relative z-[2] mt-10 text-center">
-        <Link to="/apply" className="hero-cta-primary inline-flex">
-          <span className="hero-cta-shine" />
-          Schedule Private Voice Audit
-        </Link>
+        <ClaimSeatCta />
       </div>
     </section>
   );

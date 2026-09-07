@@ -280,7 +280,7 @@ export function Quote() {
                     <button type="button" className="qt-stepper" onClick={() => setCallers((n) => Math.max(1, n - 1))}>
                       −
                     </button>
-                    <span className="min-w-[2ch] text-center font-nohemi text-[40px] leading-none text-gold md:text-[52px]">
+                    <span className="qt-count min-w-[2ch] text-center font-nohemi text-[40px] leading-none text-gold md:text-[52px]">
                       {callers}
                     </span>
                     <button type="button" className="qt-stepper" onClick={() => setCallers((n) => Math.min(10, n + 1))}>
@@ -302,7 +302,7 @@ export function Quote() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-3">
+              <div className="qt-mods grid grid-cols-1 gap-3">
                 <ToggleModule
                   label="Dedicated Lead Manager"
                   subtext="Filters the noise, warms the leads."
@@ -322,7 +322,7 @@ export function Quote() {
                 <p className="mt-1 font-manrope text-[14px] text-[color:var(--qt-muted)]">
                   Automated multi-touch sequences.
                 </p>
-                <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <div className="qt-sms mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
                   <button
                     type="button"
                     onClick={() => setSms("discuss")}
@@ -549,7 +549,7 @@ function BoardroomBooking({
           </p>
         </div>
       ) : (
-        <div className="relative mt-10 grid gap-8 lg:grid-cols-12">
+        <div className="qt-book-grid relative mt-10 grid gap-8 lg:grid-cols-12">
           <div className="qt-panel rounded-2xl p-4 md:p-6 lg:col-span-7">
             <p className="mb-4 font-manrope text-[13px] font-bold tracking-[0.22em] text-gold uppercase">
               01 · Select a day

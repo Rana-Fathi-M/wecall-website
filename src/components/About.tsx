@@ -82,13 +82,12 @@ export function About() {
         scrollTrigger: { trigger: ".ab-stats", start: "top 84%" },
       });
 
-      gsap.from(".ab-copy p", {
-        y: 36,
+      gsap.from(".ab-story", {
+        y: 48,
         opacity: 0,
-        stagger: 0.16,
-        duration: 0.9,
+        duration: 1,
         ease: "power3.out",
-        scrollTrigger: { trigger: ".ab-copy", start: "top 84%" },
+        scrollTrigger: { trigger: ".ab-story", start: "top 86%" },
       });
 
       gsap.from(".ab-pill", {
@@ -97,11 +96,51 @@ export function About() {
         stagger: 0.08,
         duration: 0.65,
         ease: "power3.out",
-        scrollTrigger: { trigger: ".ab-pills", start: "top 90%" },
+        scrollTrigger: { trigger: ".ab-pills", start: "top 92%" },
       });
     }, root);
 
-    return () => ctx.revert();
+    const card = root.current?.querySelector<HTMLElement>(".ab-story-card");
+    const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const inward = window.matchMedia("(min-width: 768px)").matches ? 22 : 12;
+    const play = () => hoverTl?.play();
+    const reverse = () => hoverTl?.reverse();
+    let hoverTl: gsap.core.Timeline | undefined;
+
+    if (card && canHover) {
+      hoverTl = gsap.timeline({
+        paused: true,
+        defaults: { duration: 0.55, ease: "power3.out" },
+      });
+      hoverTl
+        .to(card, { y: -8 }, 0)
+        .to(card.querySelector(".ab-c-tl"), { x: inward, y: inward }, 0)
+        .to(card.querySelector(".ab-c-tr"), { x: -inward, y: inward }, 0)
+        .to(card.querySelector(".ab-c-bl"), { x: inward, y: -inward }, 0)
+        .to(card.querySelector(".ab-c-br"), { x: -inward, y: -inward }, 0)
+        .to(card.querySelector(".ab-story-frame"), { opacity: 1 }, 0)
+        .fromTo(
+          card.querySelector(".ab-story-shine"),
+          { x: "-40%", opacity: 0 },
+          { x: "120%", opacity: 1, duration: 0.7 },
+          0,
+        );
+
+      card.addEventListener("pointerenter", play);
+      card.addEventListener("pointerleave", reverse);
+      card.addEventListener("focusin", play);
+      card.addEventListener("focusout", reverse);
+    }
+
+    return () => {
+      if (card) {
+        card.removeEventListener("pointerenter", play);
+        card.removeEventListener("pointerleave", reverse);
+        card.removeEventListener("focusin", play);
+        card.removeEventListener("focusout", reverse);
+      }
+      ctx.revert();
+    };
   }, []);
 
   return (
@@ -167,35 +206,58 @@ export function About() {
         </div>
       </div>
 
-      <div className="ab-copy relative z-10 mx-auto mt-8 max-w-3xl space-y-4 font-manrope text-[14px] leading-[1.5] text-white/85 md:mt-16 md:space-y-6 md:text-[18px] md:leading-[1.6]">
-        <p>
-          WeCall wasn&apos;t built by a generic BPO agency or outsourcing middleman. It was founded on
-          over 7 years of high-ticket sales leadership, with 3 dedicated years operating directly
-          inside U.S. real estate acquisitions, dispositions, and real estate project management.
-        </p>
-        <p>
-          Having managed deals across wholesaling, fix-and-flips, and rental acquisitions from list
-          generation to closed escrow, our founder understands what acquisition managers actually
-          need:{" "}
-          <strong className="font-semibold text-white">
-            clean data, clear seller motivation, realistic price expectations, and immediate
-            follow-up
-          </strong>
-          . We know the difference between a tire-kicker who just wants to hear an offer and a truly
-          distressed seller who needs to liquidate. Every process, script, and QA checklist at
-          WeCall is built from real-world acquisition experience.
-        </p>
-      </div>
+      <div className="ab-copy ab-story relative z-10 mx-auto mt-8 max-w-4xl md:mt-16">
+        <article className="ab-story-card" tabIndex={0}>
+          <span className="ab-corner ab-c-tl" aria-hidden />
+          <span className="ab-corner ab-c-tr" aria-hidden />
+          <span className="ab-corner ab-c-bl" aria-hidden />
+          <span className="ab-corner ab-c-br" aria-hidden />
+          <span className="ab-story-frame" aria-hidden />
+          <span className="ab-story-shine" aria-hidden />
 
-      <div className="ab-pills mx-auto mt-10 flex max-w-4xl flex-wrap justify-center gap-3">
-        {pillars.map((p) => (
-          <span
-            key={p}
-            className="ab-pill rounded-full border border-white/25 bg-white/10 px-4 py-2 font-manrope text-[11px] tracking-[0.16em] text-white uppercase md:text-[12px]"
-          >
-            {p}
-          </span>
-        ))}
+          <div className="ab-story-body">
+            <div className="mb-4 flex items-center gap-3 md:mb-7">
+              <span className="h-px flex-1 bg-gold/40" />
+              <p className="font-manrope text-[10px] tracking-[0.28em] text-gold uppercase md:text-[11px]">
+                From the founder&apos;s desk
+              </p>
+              <span className="h-px flex-1 bg-gold/40" />
+            </div>
+
+            <p className="font-mariyam text-[26px] leading-none text-gold md:text-[48px]">
+              not a BPO
+            </p>
+
+            <div className="mt-4 space-y-3 font-manrope text-[13px] leading-[1.55] text-white/88 md:mt-6 md:space-y-5 md:text-[18px] md:leading-[1.65]">
+              <p>
+                WeCall wasn&apos;t built by a generic BPO agency or outsourcing middleman. It was founded on
+                over 7 years of high-ticket sales leadership, with 3 dedicated years operating directly
+                inside U.S. real estate acquisitions, dispositions, and real estate project management.
+              </p>
+              <p>
+                Having managed deals across wholesaling, fix-and-flips, and rental acquisitions from list
+                generation to closed escrow, our founder understands what acquisition managers actually
+                need:{" "}
+                <strong className="font-semibold text-white">
+                  clean data, clear seller motivation, realistic price expectations, and immediate
+                  follow-up
+                </strong>
+                . We know the difference between a tire-kicker who just wants to hear an offer and a truly
+                distressed seller who needs to liquidate. Every process, script, and QA checklist at
+                WeCall is built from real-world acquisition experience.
+              </p>
+            </div>
+
+            <div className="ab-pills mt-5 grid grid-cols-2 gap-2 md:mt-8 md:gap-3">
+              {pillars.map((p, i) => (
+                <div key={p} className="ab-pill ab-pillar">
+                  <span className="ab-pillar-num">{String(i + 1).padStart(2, "0")}</span>
+                  <span>{p}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </article>
       </div>
     </section>
   );

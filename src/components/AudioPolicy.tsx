@@ -1,7 +1,15 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import {
+  armSectionPlay,
+  markRosterEnded,
+  onRosterPlaying,
+  registerRosterAudio,
+  requestRosterPlay,
+  stopRosterPlay,
+} from "../lib/voiceUnlock";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -9,10 +17,14 @@ const chips = ["Confidentiality", "Identity rights", "Active NDAs"];
 
 export function AudioPolicy() {
   const root = useRef<HTMLElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
+    registerRosterAudio(audioRef.current);
+
     const ctx = gsap.context(() => {
-      gsap.from(".ap-kicker, .ap-rule, .ap-title, .ap-copy, .ap-chip, .ap-wave, .ap-cta", {
+      gsap.from(".ap-kicker, .ap-rule, .ap-title, .ap-copy, .ap-chip, .ap-player, .ap-cta", {
         y: 32,
         opacity: 0,
         stagger: 0.07,
@@ -32,12 +44,33 @@ export function AudioPolicy() {
           transformOrigin: "center center",
         });
       });
+
+      ScrollTrigger.create({
+        trigger: root.current,
+        start: "top 80%",
+        onEnter: () => armSectionPlay(),
+        onEnterBack: () => armSectionPlay(),
+      });
     }, root);
-    return () => ctx.revert();
+
+    const offPlaying = onRosterPlaying(setPlaying);
+
+    return () => {
+      registerRosterAudio(null);
+      offPlaying();
+      ctx.revert();
+    };
   }, []);
 
   return (
     <section ref={root} className="ap-sec relative overflow-hidden bg-ink px-3 py-16 md:px-6 md:py-28">
+      <audio
+        ref={audioRef}
+        src="/media/elite-roster-invite.wav?v=10"
+        preload="auto"
+        playsInline
+        onEnded={() => markRosterEnded()}
+      />
       <div className="ap-glow" />
 
       <div className="relative z-[2] mx-auto max-w-3xl text-center">
@@ -50,9 +83,9 @@ export function AudioPolicy() {
           <span className="mt-1 block text-gold">(Private Review)</span>
         </h2>
         <p className="ap-copy mx-auto mt-4 max-w-2xl font-manrope text-[13px] leading-relaxed text-white/75 md:mt-8 md:text-[16px]">
-          To protect client confidentiality, protect caller identity rights, and preserve the
-          non-disclosure agreements of active campaigns, live call recordings and caller voice
-          audits are provided exclusively during private strategic consults.
+          Tired of leads that go nowhere? Live caller recordings stay off this page to
+          protect your deals, our callers, and active NDAs. Hear the elite roster on a
+          private strategy call — two Upcoming Millionaire seats left.
         </p>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2 md:mt-8">
@@ -63,10 +96,29 @@ export function AudioPolicy() {
           ))}
         </div>
 
-        <div className="ap-wave" aria-hidden>
-          {Array.from({ length: 22 }).map((_, i) => (
-            <span key={i} className="ap-bar" />
-          ))}
+        <div className={`ap-player ${playing ? "is-live" : ""}`}>
+          <button
+            type="button"
+            className="ap-toggle"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (playing) stopRosterPlay();
+              else requestRosterPlay();
+            }}
+            aria-pressed={playing}
+            aria-label={playing ? "Stop invitation" : "Play invitation"}
+          >
+            {playing ? (
+              <span className="ap-toggle-icon ap-toggle-stop" />
+            ) : (
+              <span className="ap-toggle-icon ap-toggle-play" />
+            )}
+          </button>
+          <div className="ap-wave" aria-hidden>
+            {Array.from({ length: 22 }).map((_, i) => (
+              <span key={i} className="ap-bar" />
+            ))}
+          </div>
         </div>
 
         <Link to="/apply" className="ap-cta hero-cta-primary mt-8 inline-flex md:mt-10">

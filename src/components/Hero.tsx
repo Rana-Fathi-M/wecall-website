@@ -20,8 +20,11 @@ export function Hero() {
       // ---------------------------------------------------------
       // Main title
       // ---------------------------------------------------------
+      const mobile = window.matchMedia("(max-width: 767px)").matches;
+
       gsap.set(".hero-title", {
         zIndex: 100,
+        force3D: true,
       });
 
       gsap.set(".hero-word", {
@@ -43,22 +46,22 @@ export function Hero() {
       // ---------------------------------------------------------
       gsap.set(".hero-copy", {
         opacity: 0,
-        y: 36,
+        y: mobile ? 28 : 72,
+        force3D: true,
       });
 
       /*
        * Refresh assemble — each card slides in from its own side
        * and settles into the collage (WHOLEDESIGN opening).
        */
-      const mobile = window.matchMedia("(max-width: 767px)").matches;
       const assemble = mobile
         ? [
-            { sel: ".hero-img-stairs", x: -36, y: -40, rest: -5 },
-            { sel: ".hero-img-dome", x: 48, y: -36, rest: 6 },
-            { sel: ".hero-img-house", x: -52, y: 24, rest: -7 },
-            { sel: ".hero-img-wood", x: 8, y: -44, rest: 3 },
-            { sel: ".hero-img-lounge", x: 44, y: 32, rest: 5 },
-            { sel: ".hero-img-courtyard", x: -28, y: 40, rest: -4 },
+            { sel: ".hero-img-stairs", x: -36, y: -40, rest: 0 },
+            { sel: ".hero-img-dome", x: 48, y: -36, rest: 0 },
+            { sel: ".hero-img-house", x: -52, y: 24, rest: 0 },
+            { sel: ".hero-img-wood", x: 8, y: -44, rest: 0 },
+            { sel: ".hero-img-lounge", x: 44, y: 32, rest: 0 },
+            { sel: ".hero-img-courtyard", x: -28, y: 40, rest: 0 },
           ]
         : [
             { sel: ".hero-img-stairs", x: -140, y: -110, rest: 0 },
@@ -139,10 +142,11 @@ export function Hero() {
        * =========================================================
        */
 
+      const leaveDur = mobile ? 0.7 : 2.2;
       const leave = {
         scale: 1,
-        ease: "power1.in" as const,
-        duration: mobile ? 1.35 : 9,
+        ease: "none" as const,
+        duration: leaveDur,
       };
 
       const stage = root.current?.querySelector(".hero-stage");
@@ -151,20 +155,20 @@ export function Hero() {
         scrollTrigger: {
           trigger: stage,
           start: "top top",
-          end: mobile ? "+=42%" : "+=340%",
+          end: mobile ? "+=28%" : "+=128%",
           pin: true,
-          scrub: mobile ? 0.45 : 0.9,
+          scrub: mobile ? 0.16 : 0.16,
           anticipatePin: 1,
           invalidateOnRefresh: true,
         },
       });
 
       /*
-       * Images leave slowly. Copy snaps in as soon as they are gone.
+       * Images leave fully, then Exclusive / WeCall lifts right away.
        */
-      scrollTl.to({}, { duration: mobile ? 0.05 : 0.35 });
+      scrollTl.to({}, { duration: mobile ? 0.03 : 0.08 });
 
-      const leaveAt = mobile ? 0.06 : 0.4;
+      const leaveAt = mobile ? 0.04 : 0.1;
 
       scrollTl.to(
         ".hero-img-stairs",
@@ -197,24 +201,26 @@ export function Hero() {
         leaveAt,
       );
 
-      scrollTl.to(".hero-title", {
-        y: mobile ? "-18vh" : "-34vh",
-        duration: mobile ? 0.4 : 0.7,
-        ease: "power3.inOut",
-      });
+      scrollTl.to(
+        ".hero-title",
+        {
+          y: mobile ? "-18vh" : "-34vh",
+          duration: mobile ? 0.28 : 0.36,
+          ease: "none",
+        },
+        leaveAt + leaveDur * 0.68,
+      );
 
       scrollTl.to(
         ".hero-copy",
         {
           y: 0,
           opacity: 1,
-          duration: mobile ? 0.32 : 0.85,
-          ease: "power3.out",
+          duration: mobile ? 0.28 : 0.36,
+          ease: "none",
         },
-        "<0.08",
+        "<",
       );
-
-      scrollTl.to({}, { duration: mobile ? 0 : 0.95 });
 
       requestAnimationFrame(() => ScrollTrigger.refresh());
     }, root);
@@ -387,7 +393,6 @@ export function Hero() {
                 max-h-[152px]
                 max-w-[242px]
                 min-w-[110px]
-                max-md:hidden
               "
             />
           </div>

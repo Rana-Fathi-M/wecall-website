@@ -77,7 +77,7 @@ export function Footer() {
       <BrandLogo className="ft-copy mx-auto h-14 w-auto drop-shadow-[0_0_30px_rgba(196,158,123,0.3)] md:h-20" />
       <a
         href="mailto:hello@wecall.com"
-        className="ft-mail mt-6 block font-nohemi text-[28px] leading-none font-extralight tracking-tight break-all text-gold drop-shadow-[0_0_40px_rgba(196,158,123,0.25)] transition-all hover:scale-105 hover:text-white md:mt-10 md:text-[72px]"
+        className="ft-mail mt-6 block font-nohemi text-[clamp(32px,8.4vw,108px)] leading-[0.95] font-extralight tracking-tight break-all text-gold drop-shadow-[0_0_40px_rgba(196,158,123,0.25)] transition-colors hover:text-white md:mt-10"
       >
         hello@wecall.com
       </a>
@@ -88,10 +88,10 @@ export function Footer() {
         For U.S. real estate investors
       </p>
 
-      <div className="ft-copy mt-6 flex justify-center gap-3 md:mt-10 md:gap-4">
+      <div className="ft-copy mt-8 flex justify-center gap-5 md:mt-12 md:gap-6">
         <Social href="#" src="/media/linkedin.svg" label="LinkedIn" />
-        <Social href="#" src="/media/instagram.svg" label="Instagram" />
         <Social href="#" src="/media/facebook.svg" label="Facebook" />
+        <Social href="#" src="/media/instagram.svg" label="Instagram" />
       </div>
 
       <div className="ft-legal mx-auto mt-8 grid max-w-5xl grid-cols-2 items-center gap-3 border-t border-white/10 pt-5 font-manrope text-[10px] tracking-widest text-white/40 uppercase md:mt-16 md:flex md:justify-between md:pt-6 md:text-[11px]">
@@ -109,12 +109,12 @@ export function Footer() {
 
 function Social({ href, src, label }: { href: string; src: string; label: string }) {
   return (
-    <a
-      href={href}
-      aria-label={label}
-      className="ft-social flex h-11 w-11 items-center justify-center rounded-full border border-white/20 transition-all hover:scale-110 hover:border-gold hover:shadow-[0_0_30px_rgba(196,158,123,0.4)]"
-    >
-      <img src={src} alt="" className="invert-on-light h-4 w-4" />
+    <a href={href} aria-label={label} className="ft-social">
+      <svg className="ft-social-ring" viewBox="0 0 64 64" aria-hidden>
+        <circle className="ft-social-track" cx="32" cy="32" r="30" />
+        <circle className="ft-social-draw" cx="32" cy="32" r="30" />
+      </svg>
+      <img src={src} alt="" className="invert-on-light ft-social-icon" />
     </a>
   );
 }

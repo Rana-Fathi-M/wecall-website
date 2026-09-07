@@ -266,14 +266,14 @@ export function Pricing() {
                   featured={t.featured}
                 />
               ) : (
-                <p className="font-nohemi text-[36px] leading-none text-gold md:text-[44px]">Dynamic</p>
+                <p className="pr-price font-nohemi text-[36px] leading-none text-gold md:text-[44px]">Dynamic</p>
               )}
               <p className="mt-2 font-manrope text-[12px] text-gold/80">{t.seats}</p>
             </div>
 
-            <p className="mt-5 font-manrope text-[15px] leading-relaxed font-medium text-white/85">{t.intro}</p>
+            <p className="pr-intro mt-5 font-manrope text-[15px] leading-relaxed font-medium text-white/85">{t.intro}</p>
 
-            <ul className="mt-5 flex-1 space-y-3 font-manrope text-[15px] font-medium text-white/80">
+            <ul className="pr-points mt-5 flex-1 space-y-3 font-manrope text-[15px] font-medium text-white/80">
               {t.points.map((p) => (
                 <li key={p} className="flex items-start gap-2.5">
                   <span className="mt-0.5 text-gold">✓</span>
@@ -354,7 +354,7 @@ function FlipPrice({
   }, [value]);
 
   return (
-    <p className={`font-nohemi text-[48px] leading-none font-semibold md:text-[58px] ${featured ? "text-white" : "text-gold"}`}>
+    <p className={`pr-price font-nohemi text-[48px] leading-none font-semibold md:text-[58px] ${featured ? "text-white" : "text-gold"}`}>
       <span ref={ref} data-val={String(value)}>
         ${value.toLocaleString()}
       </span>

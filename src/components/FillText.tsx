@@ -18,25 +18,25 @@ export function FillText() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const words = gsap.utils.toArray<HTMLElement>(".fill-word");
-      gsap.set(words, { color: "rgba(255,255,255,0.12)" });
+      const letters = gsap.utils.toArray<HTMLElement>(".fill-letter");
+      gsap.set(letters, { color: "rgba(255,255,255,0.12)" });
       gsap.set(".fill-curve", { yPercent: 72 });
 
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: root.current,
           start: "top top",
-          end: "+=110%",
-          scrub: 0.45,
+          end: "+=30%",
+          scrub: 0.28,
           pin: true,
         },
       });
 
-      tl.to(words, {
+      tl.to(letters, {
         color: "#ffffff",
-        stagger: 0.12,
+        stagger: 0.038,
         ease: "none",
-        duration: 1,
+        duration: 0.2,
       }).to(
         ".fill-curve",
         {
@@ -51,7 +51,7 @@ export function FillText() {
   }, []);
 
   return (
-    <section ref={root} className="relative z-[2] overflow-hidden bg-ink">
+    <section ref={root} className="fill-sec keep-dark relative z-[2] overflow-hidden bg-ink">
       <div className="relative flex h-screen items-center justify-center">
         <ThemePhoto
           light={photos.seats.light}
@@ -69,7 +69,11 @@ export function FillText() {
             >
               {line.map((word) => (
                 <span key={word} className="fill-word inline-block px-[0.18em]">
-                  {word}
+                  {word.split("").map((letter, i) => (
+                    <span key={`${word}-${i}`} className="fill-letter">
+                      {letter}
+                    </span>
+                  ))}
                 </span>
               ))}
             </p>
@@ -79,16 +83,16 @@ export function FillText() {
         <div className="fill-curve pointer-events-none absolute right-0 bottom-0 left-0 z-[4] w-full text-[#343434]">
           <svg
             className="curve-rise"
-            viewBox="0 0 1440 220"
+            viewBox="0 0 1440 150"
             preserveAspectRatio="none"
             aria-hidden
           >
             <path
-              d="M0 220 C 240 220 360 8 720 8 C 1080 8 1200 220 1440 220 L 1440 220 L 0 220 Z"
+              d="M0 150 C 240 150 360 28 720 28 C 1080 28 1200 150 1440 150 L 1440 150 L 0 150 Z"
               fill="currentColor"
             />
           </svg>
-          <div className="h-16 w-full bg-[#343434]" />
+          <div className="h-10 w-full bg-[#343434]" />
         </div>
       </div>
     </section>

@@ -145,7 +145,7 @@ export function Difference() {
   }, []);
 
   return (
-    <section className="bg-brown">
+    <section className="keep-dark bg-brown">
       <div className="mx-auto max-w-3xl px-4 pt-10 text-center md:px-6 md:pt-16">
         <p className="font-manrope text-[11px] tracking-[0.28em] text-cream/70 uppercase md:text-[12px]">
           The WeCall Difference

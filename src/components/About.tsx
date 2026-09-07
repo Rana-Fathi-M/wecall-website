@@ -108,13 +108,12 @@ export function About() {
     <section
       ref={root}
       id="about"
-      className="keep-dark relative overflow-hidden px-3 py-14 text-white md:px-12 md:py-32"
-      style={{ backgroundColor: "#56423f" }}
+      className="keep-dark relative overflow-hidden bg-brown px-3 py-14 text-white md:px-12 md:py-32"
     >
-      <div className="pointer-events-none absolute -top-24 left-1/2 h-[420px] w-[80vw] max-w-[900px] -translate-x-1/2 rounded-full bg-gold/15 blur-[130px]" />
-      <div className="pointer-events-none absolute right-0 bottom-0 h-64 w-64 translate-x-1/4 rounded-full bg-ink/30 blur-[90px]" />
+      <div className="pointer-events-none absolute -top-24 left-1/2 h-[420px] w-[80vw] max-w-[900px] -translate-x-1/2 rounded-full bg-white/10 blur-[130px]" />
+      <div className="pointer-events-none absolute right-0 bottom-0 h-64 w-64 translate-x-1/4 rounded-full bg-ink/20 blur-[90px]" />
 
-      <p className="ab-kicker text-center font-manrope text-[12px] tracking-[0.32em] text-gold uppercase">
+      <p className="ab-kicker text-center font-manrope text-[12px] tracking-[0.32em] text-white/70 uppercase">
         Leadership & Founder Story
       </p>
 
@@ -131,8 +130,8 @@ export function About() {
 
       <div className="ab-stats relative z-10 mx-auto mt-8 grid max-w-6xl items-center gap-4 md:mt-20 md:grid-cols-12 md:gap-8">
         <div className="grid grid-cols-2 gap-4 md:col-span-5">
-          <article className="ab-stat rounded-2xl border border-white/10 bg-ink/25 p-5 backdrop-blur-sm md:p-8">
-            <p className="ab-n7 font-nohemi text-[42px] leading-none font-extralight text-gold md:text-[88px]">
+          <article className="ab-stat rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur-sm md:p-8">
+            <p className="ab-n7 font-nohemi text-[42px] leading-none font-extralight text-white md:text-[88px]">
               00
             </p>
             <p className="mt-3 font-manrope text-[11px] tracking-[0.2em] text-white/55 uppercase">
@@ -142,8 +141,8 @@ export function About() {
               High-ticket sales leadership
             </p>
           </article>
-          <article className="ab-stat rounded-2xl border border-white/10 bg-ink/25 p-5 backdrop-blur-sm md:p-8">
-            <p className="ab-n3 font-nohemi text-[42px] leading-none font-extralight text-gold md:text-[88px]">
+          <article className="ab-stat rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur-sm md:p-8">
+            <p className="ab-n3 font-nohemi text-[42px] leading-none font-extralight text-white md:text-[88px]">
               00
             </p>
             <p className="mt-3 font-manrope text-[11px] tracking-[0.2em] text-white/55 uppercase">
@@ -161,14 +160,14 @@ export function About() {
             dark={photos.office.dark}
             className="h-[240px] w-full object-cover md:h-[360px]"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#56423f] via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-brown via-transparent to-transparent" />
           <p className="absolute bottom-5 left-5 font-mariyam text-[28px] text-white md:text-[40px]">
             veterans
           </p>
         </div>
       </div>
 
-      <div className="ab-copy relative z-10 mx-auto mt-8 max-w-3xl space-y-4 font-manrope text-[14px] leading-[1.5] text-cream/90 md:mt-16 md:space-y-6 md:text-[18px] md:leading-[1.6]">
+      <div className="ab-copy relative z-10 mx-auto mt-8 max-w-3xl space-y-4 font-manrope text-[14px] leading-[1.5] text-white/85 md:mt-16 md:space-y-6 md:text-[18px] md:leading-[1.6]">
         <p>
           WeCall wasn&apos;t built by a generic BPO agency or outsourcing middleman. It was founded on
           over 7 years of high-ticket sales leadership, with 3 dedicated years operating directly
@@ -192,7 +191,7 @@ export function About() {
         {pillars.map((p) => (
           <span
             key={p}
-            className="ab-pill rounded-full border border-gold/35 bg-gold/10 px-4 py-2 font-manrope text-[11px] tracking-[0.16em] text-gold uppercase md:text-[12px]"
+            className="ab-pill rounded-full border border-white/25 bg-white/10 px-4 py-2 font-manrope text-[11px] tracking-[0.16em] text-white uppercase md:text-[12px]"
           >
             {p}
           </span>

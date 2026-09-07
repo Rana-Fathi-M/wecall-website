@@ -8,6 +8,7 @@ import { WorkflowPage } from "./pages/WorkflowPage";
 import { PricingPage } from "./pages/PricingPage";
 import { AboutPage } from "./pages/AboutPage";
 import { ApplyPage } from "./pages/ApplyPage";
+import { TermsPage } from "./pages/TermsPage";
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/apply" element={<ApplyPage />} />
+            <Route path="/terms" element={<TermsPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

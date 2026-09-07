@@ -28,7 +28,7 @@ export function Moving3D() {
   }, []);
 
   return (
-    <section ref={root} className="relative z-[2] overflow-hidden bg-[#2a2a2a]">
+    <section ref={root} className="keep-dark relative z-[2] overflow-hidden bg-[#2a2a2a]">
       <video
         className="move3d-video block h-[72vh] w-full object-cover object-[center_82%] md:h-[86vh]"
         src="/media/moving-3d.mp4"

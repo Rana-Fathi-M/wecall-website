@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { useLenis } from "../hooks/useLenis";
-import { CustomCursor } from "./CustomCursor";
 import { Header } from "./Header";
 import { Menu } from "./Menu";
 import { Footer } from "./Footer";
@@ -20,7 +19,6 @@ export function Layout() {
 
   return (
     <div className="theme-page min-h-screen">
-      <CustomCursor />
       <Header onOpenMenu={() => setMenu(true)} />
       <Menu open={menu} onClose={() => setMenu(false)} />
       <Outlet />

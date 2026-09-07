@@ -46,15 +46,16 @@ export function Intro() {
       const track = root.current?.querySelector(".intro-track") as HTMLElement | null;
       if (!track) return;
       const mobile = window.matchMedia("(max-width: 767px)").matches;
+
       gsap.to(track, {
         x: () => -(track.scrollWidth - window.innerWidth + (mobile ? 24 : 80)),
         ease: "none",
         scrollTrigger: {
           trigger: root.current,
-          start: "top top",
-          end: mobile ? "+=120%" : "+=180%",
+          start: "top center",
+          end: "top top",
           scrub: 1,
-          pin: true,
+          invalidateOnRefresh: true,
         },
       });
     }, root);
@@ -89,7 +90,7 @@ export function Intro() {
         <PlusCircle
           to="/apply"
           label="Apply today"
-          className="plus-circle-lg absolute left-1/2 z-[6] -translate-x-1/2"
+          className="plus-circle-lg absolute left-1/2 z-[6] -translate-x-1/2 "
         />
       </div>
     </section>

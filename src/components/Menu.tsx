@@ -28,36 +28,49 @@ export function Menu({ open, onClose }: Props) {
 
     document.body.style.overflow = open ? "hidden" : "";
 
-    gsap.to(el, {
-      y: open ? 0 : "-100%",
-      duration: 0.85,
-      ease: "power4.inOut",
-    });
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
     if (open) {
-      gsap.fromTo(
-        ".mn-item",
-        { y: 70, opacity: 0 },
-        { y: 0, opacity: 1, stagger: 0.055, duration: 0.7, delay: 0.28, ease: "power3.out" },
-      );
-      gsap.fromTo(
-        ".mn-close",
-        { scale: 0.7, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 0.7, delay: 0.4, ease: "power3.out" },
-      );
+      tl.to(el, { autoAlpha: 1, duration: 0.4, ease: "power2.out" }, 0)
+        .fromTo(".mn-glass", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 0)
+        .fromTo(
+          ".mn-panel",
+          { y: 28, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.65 },
+          0.08,
+        )
+        .fromTo(
+          ".mn-item",
+          { y: 40, opacity: 0 },
+          { y: 0, opacity: 1, stagger: 0.045, duration: 0.58 },
+          0.16,
+        )
+        .fromTo(
+          ".mn-close",
+          { opacity: 0, scale: 0.86 },
+          { opacity: 1, scale: 1, duration: 0.5 },
+          0.2,
+        );
+    } else {
+      tl.to(el, { autoAlpha: 0, duration: 0.38, ease: "power2.inOut" });
     }
 
     return () => {
+      tl.kill();
       document.body.style.overflow = "";
     };
   }, [open]);
 
   return (
-    <div ref={root} className="mn-root fixed inset-0 z-[80] -translate-y-full overflow-hidden">
+    <div
+      ref={root}
+      className={`mn-root fixed inset-0 z-[80] overflow-hidden ${open ? "is-open" : ""}`}
+      aria-hidden={!open}
+    >
       <button type="button" className="mn-glass" aria-label="Close menu" onClick={onClose} />
 
-      <div className="mn-panel relative flex h-full flex-col px-5 pt-5 pb-4 md:px-10 md:pt-8 md:pb-6">
-        <div className="flex items-center justify-between">
+      <div className="mn-panel relative flex h-full w-full flex-col px-5 pt-5 pb-4 md:px-10 md:pt-8 md:pb-6">
+        <div className="flex w-full items-center justify-between pr-14 md:pr-16">
           <Link to="/" onClick={onClose}>
             <BrandLogo className="h-9 w-auto md:h-14" />
           </Link>

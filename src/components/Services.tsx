@@ -12,28 +12,22 @@ export function Services() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from(".svc-kicker", {
-        y: 50,
+      gsap.from(".svc-kicker, .svc-title, .svc-copy", {
+        y: 48,
         opacity: 0,
+        stagger: 0.08,
         duration: 1,
         ease: "power3.out",
         scrollTrigger: { trigger: root.current, start: "top 75%" },
       });
-      gsap.from(".svc-title", {
-        y: 70,
-        opacity: 0,
-        duration: 1.1,
-        delay: 0.08,
-        ease: "power3.out",
-        scrollTrigger: { trigger: root.current, start: "top 75%" },
-      });
+
       gsap.from(".svc-card", {
-        y: 120,
-        rotateX: 12,
+        y: 80,
         opacity: 0,
-        stagger: 0.16,
-        duration: 1.05,
+        stagger: 0.14,
+        duration: 1,
         ease: "power3.out",
+        clearProps: "transform",
         scrollTrigger: { trigger: ".svc-grid", start: "top 80%" },
       });
     }, root);
@@ -55,35 +49,45 @@ export function Services() {
         <h2 className="svc-title mt-1 font-nohemi text-[28px] leading-none font-light text-white uppercase md:text-[80px]">
           services
         </h2>
-        <p className="mx-auto mt-3 max-w-xl font-manrope text-[13px] leading-relaxed text-white/70 md:mt-6 md:text-sm">
+        <p className="svc-copy mx-auto mt-3 max-w-xl font-manrope text-[13px] leading-relaxed text-white/70 md:mt-6 md:text-sm">
           Turnkey Egyptian cold calling desks, lead managers, and acquisition managers trained in
           U.S. real estate acquisitions — pre-vetted motivated seller leads, zero management
           overhead.
         </p>
       </div>
 
-      <div
-        className="svc-grid relative z-[2] grid grid-cols-2 gap-2 px-3 pb-2 md:gap-5 md:px-8 lg:flex lg:justify-center lg:overflow-visible"
-        style={{ perspective: "1200px" }}
-      >
+      <div className="svc-grid relative z-[2] grid grid-cols-2 gap-2 px-3 pb-2 md:gap-5 md:px-8 lg:flex lg:justify-center lg:overflow-visible">
         {services.map((s) => (
-          <article
+          <Link
             key={s.n}
+            to="/apply"
             data-cursor
-            className="svc-card keep-dark relative h-[250px] w-full min-w-0 overflow-hidden px-3 py-5 md:h-[520px] md:px-8 md:py-10 lg:h-[740px] lg:w-[380px] lg:max-w-[420px] lg:shrink-0"
+            className="svc-card keep-dark relative h-[250px] w-full min-w-0 overflow-hidden px-3 py-5 text-white md:h-[520px] md:px-8 md:py-10 lg:h-[740px] lg:w-[380px] lg:max-w-[420px] lg:shrink-0"
           >
-            <ThemePhoto light={s.photo.light} dark={s.photo.dark} className="absolute inset-0 h-full w-full object-cover" />
-            <div className="absolute inset-0 bg-black/45" />
+            <ThemePhoto
+              light={s.photo.light}
+              dark={s.photo.dark}
+              alt={s.title}
+              className="svc-card-img absolute inset-0 h-full w-full object-cover"
+            />
+            <span className="svc-card-veil" />
+            <span className="svc-card-shine" />
             <div className="relative z-[2] flex h-full flex-col items-center justify-center text-center">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full border border-white/20 font-nohemi text-[12px] text-gold">
-                {s.n}
+              <span className="svc-card-num">
+                {s.n.padStart(2, "0")}
               </span>
-              <h3 className="mt-3 font-nohemi text-[14px] leading-tight font-light md:mt-6 md:text-[28px]">{s.title}</h3>
-              <p className="mt-2 max-w-[320px] font-manrope text-[11px] leading-[1.3] font-medium md:mt-5 md:text-[14px] md:leading-[1.35]">
+              <h3 className="svc-card-title mt-3 font-nohemi text-[14px] leading-tight font-light md:mt-6 md:text-[28px]">
+                {s.title}
+              </h3>
+              <p className="svc-card-copy mt-2 max-w-[320px] font-manrope text-[11px] leading-[1.3] font-medium md:mt-5 md:text-[14px] md:leading-[1.35]">
                 {s.copy}
               </p>
+              <span className="svc-card-cta">
+                Apply now
+                <i />
+              </span>
             </div>
-          </article>
+          </Link>
         ))}
       </div>
 

@@ -9,20 +9,23 @@ type Props = {
 
 export function Header({ onOpenMenu }: Props) {
   const [hidden, setHidden] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     let last = window.scrollY;
     const onScroll = () => {
       const y = window.scrollY;
       setHidden(y > last && y > 90);
+      setScrolled(y > 16);
       last = y;
     };
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
-    <header className={`site-header ${hidden ? "is-hidden" : ""}`}>
+    <header className={`site-header ${hidden ? "is-hidden" : ""} ${scrolled ? "is-scrolled" : ""}`}>
       <div className="site-nav">
         <div className="nav-side nav-side-left">
           <button type="button" onClick={onOpenMenu} className="nav-menu">

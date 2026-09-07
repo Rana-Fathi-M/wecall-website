@@ -1,18 +1,137 @@
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent, type RefObject } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/style.css";
+import { sendBookingEmail } from "../lib/sendBookingEmail";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const focuses = [
-  "Wholesaling",
-  "Fix & Flip",
-  "Buy & Hold (BRRRR)",
-  "Creative Finance (Sub-To)",
-];
-
 const titleA = ["Secure", "Your", "Market", "Monopoly."];
 const titleB = ["Build", "Your", "Acquisition", "Desk."];
+
+const TIME_SLOTS = [
+  "09:00 AM",
+  "09:30 AM",
+  "10:00 AM",
+  "10:30 AM",
+  "11:00 AM",
+  "11:30 AM",
+  "01:00 PM",
+  "01:30 PM",
+  "02:00 PM",
+  "02:30 PM",
+  "03:00 PM",
+  "03:30 PM",
+  "04:00 PM",
+];
+
+const TIMEZONES = [
+  "America/New_York",
+  "America/Chicago",
+  "America/Denver",
+  "America/Los_Angeles",
+  "America/Phoenix",
+  "America/Toronto",
+  "Europe/London",
+  "Europe/Paris",
+  "Europe/Berlin",
+  "Africa/Cairo",
+  "Asia/Dubai",
+  "Asia/Riyadh",
+  "Asia/Karachi",
+  "Asia/Kolkata",
+  "Asia/Singapore",
+  "Australia/Sydney",
+];
+
+function detectedTimezone() {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York";
+  } catch {
+    return "America/New_York";
+  }
+}
+
+function timezoneLabel(zone: string) {
+  try {
+    const now = new Date();
+    const offset =
+      new Intl.DateTimeFormat("en-US", {
+        timeZone: zone,
+        timeZoneName: "shortOffset",
+      })
+        .formatToParts(now)
+        .find((part) => part.type === "timeZoneName")?.value ?? "";
+    const city = zone.split("/").pop()?.replace(/_/g, " ") ?? zone;
+    return `${city} · ${offset}`;
+  } catch {
+    return zone;
+  }
+}
+
+function formatDay(date: Date) {
+  return date.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+const OWNER_TIMEZONE = "Africa/Cairo";
+
+function parseSlot(slot: string) {
+  const match = slot.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!match) return { hour: 9, minute: 0 };
+  let hour = Number(match[1]);
+  const minute = Number(match[2]);
+  const mer = match[3].toUpperCase();
+  if (mer === "AM" && hour === 12) hour = 0;
+  if (mer === "PM" && hour !== 12) hour += 12;
+  return { hour, minute };
+}
+
+function zoneOffsetMs(utcMs: number, timeZone: string) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(new Date(utcMs));
+  const get = (type: Intl.DateTimeFormatPartTypes) =>
+    Number(parts.find((part) => part.type === type)?.value ?? 0);
+  const asUtc = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second"));
+  return asUtc - utcMs;
+}
+
+function wallTimeToDate(day: Date, slot: string, timeZone: string) {
+  const { hour, minute } = parseSlot(slot);
+  const utcGuess = Date.UTC(day.getFullYear(), day.getMonth(), day.getDate(), hour, minute);
+  const instant = utcGuess - zoneOffsetMs(utcGuess, timeZone);
+  return new Date(utcGuess - zoneOffsetMs(instant, timeZone));
+}
+
+function formatInZone(date: Date, timeZone: string) {
+  return {
+    date: date.toLocaleDateString("en-US", {
+      timeZone,
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+    }),
+    time: date.toLocaleTimeString("en-US", {
+      timeZone,
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }),
+    zone: timezoneLabel(timeZone),
+  };
+}
 
 export function Quote() {
   const root = useRef<HTMLElement>(null);
@@ -74,24 +193,6 @@ export function Quote() {
         scrollTrigger: { trigger: ".qt-build", start: "top 84%" },
       });
 
-      gsap.from(".qt-field", {
-        y: 28,
-        opacity: 0,
-        stagger: 0.06,
-        duration: 0.55,
-        ease: "power2.out",
-        scrollTrigger: { trigger: ".qt-form", start: "top 82%" },
-      });
-
-      gsap.from(".qt-day, .qt-slot", {
-        y: 24,
-        opacity: 0,
-        stagger: 0.04,
-        duration: 0.45,
-        ease: "power2.out",
-        scrollTrigger: { trigger: ".qt-cal", start: "top 86%" },
-      });
-
       gsap.to(".qt-watermark", {
         y: -80,
         ease: "none",
@@ -122,9 +223,9 @@ export function Quote() {
       el.dataset.val = String(value);
     };
 
-    tween(priceRef.current, price, "$", "/mo");
-    tween(recordsRef.current, records, "", " records");
-    tween(leadsRef.current, leads, "~", " leads/mo");
+    tween(priceRef.current, price, "$");
+    tween(recordsRef.current, records);
+    tween(leadsRef.current, leads, "~");
   }, [price, records, leads]);
 
   return (
@@ -139,7 +240,7 @@ export function Quote() {
         <header className="qt-head relative mx-auto max-w-5xl pb-3 text-center md:pb-8">
           <span className="qt-kicker qt-stamp">Application Only • Strictly Confidential</span>
           <h2
-            className="relative mt-4 font-nohemi text-[26px] leading-[0.92] font-light sm:text-[48px] md:mt-6 md:text-[72px]"
+            className="relative mt-4 font-nohemi text-[32px] leading-[0.92] font-semibold sm:text-[56px] md:mt-6 md:text-[84px]"
             style={{ perspective: "900px" }}
           >
             <span className="block">
@@ -157,30 +258,29 @@ export function Quote() {
               ))}
             </span>
           </h2>
-          <p className="qt-lede relative mx-auto mt-4 max-w-2xl font-manrope text-[13px] leading-relaxed text-[color:var(--qt-muted)] md:mt-6 md:text-[17px]">
-            This is not a sales call. This is an integration mapping session. Dial in your target
-            operational volume below so our engineers can pre-configure your market data prior to
-            our boardroom session.
+          <p className="qt-lede relative mx-auto mt-4 max-w-2xl font-manrope text-[16px] leading-relaxed font-medium text-[color:var(--qt-muted)] md:mt-6 md:text-[20px]">
+            Dial in the desk, lock a boardroom day, confirm your timezone and time, then send the
+            brief. We review every application within 24 hours.
           </p>
         </header>
 
         <div className="qt-build mt-10 lg:mt-14">
-          <div className="qt-ticket qt-frame grid overflow-hidden lg:grid-cols-12">
-            <div className="space-y-3 p-4 md:space-y-4 md:p-8 lg:col-span-7">
-              <p className="font-manrope text-[11px] font-bold tracking-[0.28em] text-gold uppercase">
+          <div className="qt-ticket qt-frame grid min-w-0 overflow-hidden lg:grid-cols-[minmax(0,1fr)_40px_minmax(0,0.9fr)]">
+            <div className="min-w-0 space-y-3 p-4 md:space-y-4 md:p-8">
+              <p className="font-manrope text-[13px] font-bold tracking-[0.28em] text-gold uppercase">
                 Live Desk Configuration
               </p>
 
-              <div className="qt-panel rounded-2xl p-5 md:p-6">
-                <div className="flex items-center justify-between gap-4">
-                  <label className="font-manrope text-[12px] tracking-[0.16em] uppercase opacity-70">
+              <div className="qt-panel min-w-0 rounded-2xl p-4 md:p-6">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <label className="min-w-0 font-manrope text-[13px] font-semibold tracking-[0.16em] text-[color:var(--qt-muted)] uppercase md:text-[14px]">
                     Dedicated Acquisition Agents
                   </label>
-                  <div className="flex items-center gap-3">
+                  <div className="flex shrink-0 items-center gap-3">
                     <button type="button" className="qt-stepper" onClick={() => setCallers((n) => Math.max(1, n - 1))}>
                       −
                     </button>
-                    <span className="min-w-[2ch] text-center font-nohemi text-[36px] leading-none text-gold md:text-[56px]">
+                    <span className="min-w-[2ch] text-center font-nohemi text-[40px] leading-none text-gold md:text-[52px]">
                       {callers}
                     </span>
                     <button type="button" className="qt-stepper" onClick={() => setCallers((n) => Math.min(10, n + 1))}>
@@ -202,7 +302,7 @@ export function Quote() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 md:grid-cols-1 md:gap-4">
+              <div className="grid grid-cols-1 gap-3">
                 <ToggleModule
                   label="Dedicated Lead Manager"
                   subtext="Filters the noise, warms the leads."
@@ -217,16 +317,16 @@ export function Quote() {
                 />
               </div>
 
-              <div className="qt-panel rounded-2xl p-5 md:p-6">
-                <p className="font-manrope text-[15px] font-medium">Omnichannel SMS Suite</p>
-                <p className="mt-1 font-manrope text-[12px] text-[color:var(--qt-muted)]">
+              <div className="qt-panel min-w-0 rounded-2xl p-4 md:p-6">
+                <p className="font-manrope text-[17px] font-semibold">Omnichannel SMS Suite</p>
+                <p className="mt-1 font-manrope text-[14px] text-[color:var(--qt-muted)]">
                   Automated multi-touch sequences.
                 </p>
-                <div className="mt-4 grid grid-cols-2 gap-2">
+                <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
                   <button
                     type="button"
                     onClick={() => setSms("discuss")}
-                    className={`rounded-xl px-4 py-3 font-manrope text-[12px] ${
+                    className={`min-h-[48px] rounded-xl px-3 py-3 font-manrope text-[14px] font-medium leading-snug ${
                       sms === "discuss" ? "bg-gold text-ink" : "border border-[color:var(--qt-line)]"
                     }`}
                   >
@@ -235,7 +335,7 @@ export function Quote() {
                   <button
                     type="button"
                     onClick={() => setSms("yes")}
-                    className={`rounded-xl px-4 py-3 font-manrope text-[12px] ${
+                    className={`min-h-[48px] rounded-xl px-3 py-3 font-manrope text-[14px] font-medium leading-snug ${
                       sms === "yes" ? "bg-gold text-ink" : "border border-[color:var(--qt-line)]"
                     }`}
                   >
@@ -245,131 +345,363 @@ export function Quote() {
               </div>
             </div>
 
-            <div className="relative hidden lg:block lg:col-span-1">
-              <div className="qt-perforation absolute inset-y-6 left-1/2 w-3 -translate-x-1/2" />
+            <div className="relative hidden lg:block">
+              <div className="qt-perforation absolute inset-y-8 left-1/2 w-2.5 -translate-x-1/2" />
             </div>
 
-            <aside className="qt-hud qt-hud-panel m-4 lg:col-span-4 lg:m-5">
-              <p className="font-manrope text-[11px] font-bold tracking-[0.28em] text-gold uppercase">
+            <aside className="qt-hud qt-hud-panel relative m-3 min-w-0 overflow-hidden lg:m-5 lg:ml-0">
+              <span className="qt-hud-step">02</span>
+              <p className="font-manrope text-[13px] font-bold tracking-[0.22em] text-gold uppercase">
                 Your Projected Arsenal
               </p>
-              <p className="mt-3 font-manrope text-[13px] text-[color:var(--qt-muted)]">
+              <p className="mt-2 font-manrope text-[15px] leading-relaxed text-[color:var(--qt-muted)]">
                 This is the desk your competitors wish they booked first.
               </p>
-              <p className="mt-8 font-manrope text-[11px] tracking-[0.2em] uppercase opacity-40">
-                Operating Capital:
-              </p>
-              <p ref={priceRef} data-val="1500" className="mt-1 font-nohemi text-[36px] leading-none font-extralight md:text-[64px]">
-                $1,500/mo
-              </p>
-              <div className="mt-5 grid grid-cols-2 gap-2 md:mt-8 md:grid-cols-1 md:gap-3">
-                <HudRow label="Proprietary Data (Skip-Traced):" valueRef={recordsRef} fallback="10,000 records" val="10000" />
-                <HudRow label="Guaranteed Warm Lead Flow:" valueRef={leadsRef} fallback="~45 leads/mo" val="45" />
-                <div className="qt-panel col-span-2 rounded-xl px-4 py-4 md:col-span-1">
-                  <p className="font-manrope text-[11px] tracking-widest uppercase opacity-45">
-                    90-Day Conversion Benchmark:
-                  </p>
-                  <p className="mt-2 font-nohemi text-[22px] text-gold">5 Closed Deals</p>
+              <div className="qt-hud-price">
+                <p className="font-manrope text-[11px] tracking-[0.2em] uppercase opacity-45">
+                  Operating Capital
+                </p>
+                <p className="qt-price mt-2 flex min-w-0 flex-wrap items-end gap-1.5">
+                  <span ref={priceRef} data-val="1500" className="font-nohemi leading-none font-semibold">
+                    $1,500
+                  </span>
+                  <span className="mb-1 font-manrope text-[13px] text-[color:var(--qt-muted)]">/mo</span>
+                </p>
+              </div>
+              <div className="mt-5 grid grid-cols-1 gap-2.5">
+                <HudRow label="Proprietary data" hint="Skip-traced records" valueRef={recordsRef} fallback="10,000" val="10000" />
+                <HudRow label="Warm lead flow" hint="Projected / month" valueRef={leadsRef} fallback="~45" val="45" />
+                <div className="qt-stat">
+                  <div className="min-w-0">
+                    <p className="qt-stat-label">90-day benchmark</p>
+                    <p className="qt-stat-hint">Conversion target</p>
+                  </div>
+                  <p className="qt-stat-value">5 deals</p>
                 </div>
               </div>
-              <p className="mt-6 flex items-center gap-2 font-manrope text-[11px] tracking-[0.16em] text-gold uppercase">
-                <span className="seat-pulse inline-block h-2 w-2 rounded-full bg-gold" />
+              <p className="mt-5 flex items-start gap-2 font-manrope text-[11px] leading-snug tracking-[0.12em] text-gold uppercase">
+                <span className="seat-pulse mt-1 inline-block h-2 w-2 shrink-0 rounded-full bg-gold" />
                 2 cohort seats left — reviewed in 24 hours
               </p>
             </aside>
           </div>
         </div>
 
-        <div className="qt-form qt-ticket qt-frame relative mt-4 overflow-hidden p-4 md:mt-8 md:p-10 lg:p-14">
-          <span className="qt-step-mark">01</span>
-          <p className="relative mb-2 flex items-center gap-2 font-manrope text-[11px] font-bold tracking-[0.22em] text-gold uppercase">
-            <span className="seat-pulse inline-block h-2 w-2 rounded-full bg-gold" />
-            2 cohort seats left — reviewed in 24 hours
-          </p>
-          <h3 className="relative mb-6 font-nohemi text-[22px] font-light md:mb-10 md:text-[42px]">
-            Step 1: Strategic Alignment
-          </h3>
-          <form
-            className="relative space-y-4 md:space-y-8"
-            onSubmit={(e) => {
-              e.preventDefault();
-              document.getElementById("boardroom")?.scrollIntoView({ behavior: "smooth" });
-            }}
-          >
-            <div className="qt-form-fields grid grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-8">
-              <Field label="Full Name" name="name" autoComplete="name" validate={isName} />
-              <Field label="Direct Email" name="email" type="email" autoComplete="email" validate={isEmail} />
-              <Field label="Direct Phone" name="phone" type="tel" autoComplete="tel" validate={isPhone} />
-              <Field label="Target Deployment Date" name="start" validate={isFilled} />
-            </div>
-
-            <fieldset className="qt-field">
-              <legend className="mb-3 font-manrope text-[11px] font-bold tracking-widest uppercase opacity-45">
-                Primary Investment Mechanism
-              </legend>
-              <div className="grid grid-cols-2 gap-2 font-manrope text-[13px] md:gap-3 md:text-[14px]">
-                {focuses.map((f, i) => (
-                  <label
-                    key={f}
-                    className="qt-chip flex min-h-[50px] cursor-pointer items-center gap-2 rounded-2xl border border-[color:var(--qt-line)] bg-[color:var(--qt-panel)] px-3 py-3 has-[:checked]:border-gold has-[:checked]:bg-gold/15 has-[:checked]:text-gold md:gap-3 md:px-5 md:py-4"
-                  >
-                    <input type="checkbox" name="focus" value={f} className="sr-only" />
-                    <span className="font-nohemi text-[13px] text-gold/70">0{i + 1}</span>
-                    <span>{f}</span>
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-
-            <Field
-              label="Target Market & Buy-Box"
-              name="market"
-              as="textarea"
-              validate={isLong}
-            />
-            <Field
-              label="Core Operational Bottleneck"
-              name="bottleneck"
-              as="textarea"
-              validate={isLong}
-            />
-
-            <input type="hidden" name="callers" value={callers} />
-            <input type="hidden" name="leadManager" value={String(leadManager)} />
-            <input type="hidden" name="acquisitionManager" value={String(acq)} />
-            <input type="hidden" name="sms" value={sms} />
-            <input type="hidden" name="price" value={String(price)} />
-
-            <div className="qt-submit-bar">
-              <button type="submit" className="hero-cta-primary w-full max-w-none">
-                <span className="hero-cta-shine" />
-                Submit Blueprint & Proceed to Calendar
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <BoardroomCalendar />
+        <BoardroomBooking
+          callers={callers}
+          leadManager={leadManager}
+          acq={acq}
+          sms={sms}
+          price={price}
+        />
       </div>
     </section>
   );
 }
 
+function BoardroomBooking({
+  callers,
+  leadManager,
+  acq,
+  sms,
+  price,
+}: {
+  callers: number;
+  leadManager: boolean;
+  acq: boolean;
+  sms: "yes" | "discuss";
+  price: number;
+}) {
+  const today = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
+
+  const zones = useMemo(() => {
+    const local = detectedTimezone();
+    return [local, ...TIMEZONES.filter((z) => z !== local)];
+  }, []);
+
+  const [day, setDay] = useState<Date | undefined>();
+  const [timezone, setTimezone] = useState("");
+  const [time, setTime] = useState<string | null>(null);
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [error, setError] = useState("");
+
+  const conversion = useMemo(() => {
+    if (!day || !timezone || !time) return null;
+    const instant = wallTimeToDate(day, time, timezone);
+    return {
+      guest: formatInZone(instant, timezone),
+      owner: formatInZone(instant, OWNER_TIMEZONE),
+    };
+  }, [day, timezone, time]);
+
+  const step = !day ? 1 : !timezone ? 2 : !time ? 3 : 4;
+
+  const onPickDay = (next?: Date) => {
+    setDay(next);
+    setTimezone("");
+    setTime(null);
+    setStatus("idle");
+    setError("");
+  };
+
+  const onPickZone = (zone: string) => {
+    setTimezone(zone);
+    setTime(null);
+    setStatus("idle");
+  };
+
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!day || !timezone || !time) return;
+
+    const form = new FormData(e.currentTarget);
+    const name = String(form.get("name") || "");
+    const email = String(form.get("email") || "");
+    const phone = String(form.get("phone") || "");
+    const startDate = String(form.get("start") || "");
+    const market = String(form.get("market") || "");
+    const bottleneck = String(form.get("bottleneck") || "");
+
+    if (!isName(name) || !isEmail(email) || !isPhone(phone) || !isFilled(startDate) || !isLong(market) || !isLong(bottleneck)) {
+      setError("Complete every field before locking the session.");
+      return;
+    }
+
+    setStatus("sending");
+    setError("");
+
+    try {
+      await sendBookingEmail({
+        name,
+        email,
+        phone,
+        startDate,
+        market,
+        bottleneck,
+        meetingDate: formatDay(day),
+        meetingTime: time,
+        timezone: timezoneLabel(timezone),
+        ownerTimezone: timezoneLabel(OWNER_TIMEZONE),
+        ownerTime: conversion
+          ? `${conversion.owner.date} at ${conversion.owner.time}`
+          : "",
+        callers,
+        leadManager,
+        closer: acq,
+        sms: sms === "yes" ? "Inject into Build" : "Discuss on Consult",
+        price,
+      });
+      setStatus("sent");
+    } catch (err) {
+      setStatus("error");
+      setError(err instanceof Error ? err.message : "Could not send the booking. Try again.");
+    }
+  };
+
+  return (
+    <div id="boardroom" className="qt-book qt-ticket qt-frame relative mt-4 overflow-hidden p-4 md:mt-8 md:p-10 lg:p-12">
+      <span className="qt-step-mark">0{step}</span>
+      <p className="relative mb-2 flex items-center gap-2 font-manrope text-[11px] font-bold tracking-[0.22em] text-gold uppercase">
+        <span className="seat-pulse inline-block h-2 w-2 rounded-full bg-gold" />
+        2 cohort seats left — reviewed in 24 hours
+      </p>
+      <h3 className="relative font-nohemi text-[28px] leading-[0.95] font-semibold md:text-[48px]">
+        Secure Your Boardroom Session
+      </h3>
+      <span className="relative mt-4 block h-px w-14 bg-gold/50" />
+      <p className="relative mt-4 max-w-2xl font-manrope text-[16px] leading-relaxed font-medium text-[color:var(--qt-muted)] md:text-[19px]">
+        Pick a weekday, confirm the timezone, lock a time, then send the brief. The full desk build
+        travels with the booking.
+      </p>
+
+      <ol className="qt-book-steps relative mt-8">
+        {[
+          ["01", "Day"],
+          ["02", "Timezone"],
+          ["03", "Time"],
+          ["04", "Details"],
+        ].map(([n, label], i) => (
+          <li key={label} className={step >= i + 1 ? "is-active" : ""}>
+            <span>{n}</span>
+            {label}
+          </li>
+        ))}
+      </ol>
+
+      {status === "sent" ? (
+        <div className="lock-burst relative mt-10 rounded-2xl border border-gold/40 bg-gold/10 px-6 py-16 text-center">
+          <p className="font-mariyam text-[56px] leading-none text-gold md:text-[80px]">locked</p>
+          <p className="mt-4 font-nohemi text-[28px] font-semibold md:text-[40px]">{day ? formatDay(day) : ""}</p>
+          <p className="mt-2 font-manrope text-[18px] font-medium text-gold">
+            {conversion ? `${conversion.guest.time} · ${conversion.guest.zone}` : time}
+          </p>
+          {conversion ? (
+            <p className="mt-2 font-manrope text-[15px] text-[color:var(--qt-muted)]">
+              WeCall time: {conversion.owner.time} · {conversion.owner.zone}
+            </p>
+          ) : null}
+          <p className="mx-auto mt-5 max-w-md font-manrope text-[13px] text-[color:var(--qt-muted)]">
+            Your boardroom brief is in the inbox. We review applications within 24 hours.
+          </p>
+        </div>
+      ) : (
+        <div className="relative mt-10 grid gap-8 lg:grid-cols-12">
+          <div className="qt-panel rounded-2xl p-4 md:p-6 lg:col-span-7">
+            <p className="mb-4 font-manrope text-[13px] font-bold tracking-[0.22em] text-gold uppercase">
+              01 · Select a day
+            </p>
+            <DayPicker
+              mode="single"
+              selected={day}
+              onSelect={onPickDay}
+              disabled={[{ before: today }, { dayOfWeek: [0, 6] }]}
+              startMonth={today}
+              className="qt-picker"
+              animate
+            />
+          </div>
+
+          <div className="min-w-0 space-y-5 lg:col-span-5">
+            <div className={`qt-panel rounded-2xl p-4 md:p-6 ${day ? "" : "pointer-events-none opacity-40"}`}>
+              <p className="mb-3 font-manrope text-[13px] font-bold tracking-[0.22em] text-gold uppercase">
+                02 · Timezone
+              </p>
+              <label className="block">
+                <span className="sr-only">Timezone</span>
+                <select
+                  className="qt-input qt-zone"
+                  value={timezone}
+                  disabled={!day}
+                  onChange={(e) => onPickZone(e.target.value)}
+                >
+                  <option value="">Select your timezone</option>
+                  {zones.map((zone) => (
+                    <option key={zone} value={zone}>
+                      {timezoneLabel(zone)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <div className={`qt-panel rounded-2xl p-4 md:p-6 ${timezone ? "" : "pointer-events-none opacity-40"}`}>
+              <p className="mb-3 font-manrope text-[13px] font-bold tracking-[0.22em] text-gold uppercase">
+                03 · Meeting time
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {TIME_SLOTS.map((slot) => (
+                  <button
+                    key={slot}
+                    type="button"
+                    disabled={!timezone}
+                    onClick={() => {
+                      setTime(slot);
+                      setStatus("idle");
+                    }}
+                    className={`qt-slot min-h-[50px] rounded-xl px-3 py-3 text-left font-manrope text-[15px] font-medium ${
+                      time === slot ? "bg-gold text-ink" : "border border-[color:var(--qt-line)]"
+                    }`}
+                  >
+                    {slot}
+                  </button>
+                ))}
+              </div>
+              {conversion ? <TimeConversionCard guest={conversion.guest} owner={conversion.owner} /> : null}
+            </div>
+          </div>
+
+          {time && day && timezone ? (
+            <form className="qt-form relative space-y-4 lg:col-span-12 md:space-y-8" onSubmit={submit}>
+              <div>
+                <p className="font-manrope text-[13px] font-bold tracking-[0.22em] text-gold uppercase">
+                  04 · Your details
+                </p>
+                <TimeConversionCard guest={conversion!.guest} owner={conversion!.owner} />
+              </div>
+
+              <div className="qt-form-fields grid grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-8">
+                <Field label="Name" name="name" autoComplete="name" validate={isName} />
+                <Field label="Email" name="email" type="email" autoComplete="email" validate={isEmail} />
+                <Field label="Phone Number" name="phone" type="tel" autoComplete="tel" validate={isPhone} />
+                <Field label="Target Start Date" name="start" type="date" validate={isFilled} />
+              </div>
+
+              <Field label="Target Market & Buy-Box" name="market" as="textarea" validate={isLong} />
+              <Field label="Core Operational Bottleneck" name="bottleneck" as="textarea" validate={isLong} />
+
+              {error ? (
+                <p className="font-manrope text-[13px] text-red-400">{error}</p>
+              ) : null}
+
+              <div className="qt-submit-bar">
+                <button type="submit" disabled={status === "sending"} className="hero-cta-primary w-full max-w-none disabled:opacity-40">
+                  <span className="hero-cta-shine" />
+                  {status === "sending" ? "Sending brief…" : "Submit Boardroom Brief"}
+                </button>
+              </div>
+            </form>
+          ) : null}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TimeConversionCard({
+  guest,
+  owner,
+}: {
+  guest: { date: string; time: string; zone: string };
+  owner: { date: string; time: string; zone: string };
+}) {
+  return (
+    <div className="mt-4 grid gap-2 rounded-2xl border border-gold/35 bg-gold/10 p-4">
+      <div>
+        <p className="font-manrope text-[11px] font-bold tracking-[0.18em] text-gold uppercase">
+          Your timezone
+        </p>
+        <p className="mt-1 font-manrope text-[16px] font-semibold leading-snug">
+          {guest.time} · {guest.zone}
+        </p>
+        <p className="mt-0.5 font-manrope text-[13px] text-[color:var(--qt-muted)]">{guest.date}</p>
+      </div>
+      <div className="border-t border-gold/20 pt-3">
+        <p className="font-manrope text-[11px] font-bold tracking-[0.18em] text-gold uppercase">
+          WeCall time · Cairo
+        </p>
+        <p className="mt-1 font-manrope text-[16px] font-semibold leading-snug">
+          {owner.time} · {owner.zone}
+        </p>
+        <p className="mt-0.5 font-manrope text-[13px] text-[color:var(--qt-muted)]">{owner.date}</p>
+      </div>
+    </div>
+  );
+}
+
 function HudRow({
   label,
+  hint,
   valueRef,
   fallback,
   val,
 }: {
   label: string;
+  hint: string;
   valueRef: RefObject<HTMLSpanElement | null>;
   fallback: string;
   val: string;
 }) {
   return (
-    <div className="qt-panel flex min-w-0 flex-col justify-between gap-2 rounded-xl px-3 py-3 md:flex-row md:items-end md:gap-4 md:px-4 md:py-4">
-      <p className="font-manrope text-[10px] text-[color:var(--qt-muted)] md:text-[12px]">{label}</p>
-      <span ref={valueRef} data-val={val} className="font-nohemi text-[14px] text-gold md:text-[22px]">
+    <div className="qt-stat">
+      <div className="min-w-0">
+        <p className="qt-stat-label">{label}</p>
+        <p className="qt-stat-hint">{hint}</p>
+      </div>
+      <span ref={valueRef} data-val={val} className="qt-stat-value">
         {fallback}
       </span>
     </div>
@@ -391,18 +723,18 @@ function ToggleModule({
     <button
       type="button"
       onClick={() => onChange(!checked)}
-      className={`flex min-h-[50px] w-full items-center justify-between gap-2 rounded-2xl border p-3 text-left md:gap-4 md:p-6 ${
+      className={`flex min-h-[72px] w-full min-w-0 items-center justify-between gap-4 rounded-2xl border p-4 text-left md:p-5 ${
         checked
           ? "border-gold/60 bg-gold/10"
           : "border-[color:var(--qt-line)] bg-[color:var(--qt-panel)]"
       }`}
     >
-      <div>
-        <p className="font-manrope text-[12px] leading-snug font-medium md:text-[15px]">{label}</p>
-        <p className="mt-1 font-manrope text-[10px] leading-snug text-[color:var(--qt-muted)] md:text-[12px]">{subtext}</p>
+      <div className="min-w-0">
+        <p className="font-manrope text-[15px] leading-snug font-semibold md:text-[17px]">{label}</p>
+        <p className="mt-1 font-manrope text-[13px] leading-snug text-[color:var(--qt-muted)]">{subtext}</p>
       </div>
-      <span className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full ${checked ? "bg-gold" : "opacity-25"}`} style={checked ? undefined : { background: "var(--qt-fg)" }}>
-        <span className={`inline-block h-5 w-5 rounded-full bg-white transition-transform ${checked ? "translate-x-6" : "translate-x-1"}`} />
+      <span className={`qt-switch ${checked ? "is-on" : ""}`} aria-hidden>
+        <span className="qt-switch-knob" />
       </span>
     </button>
   );
@@ -432,11 +764,12 @@ function Field({
   const [valid, setValid] = useState(false);
 
   return (
-    <label className={`qt-field qt-float group ${valid ? "is-valid" : ""}`}>
+    <label className={`qt-field qt-float group ${valid ? "is-valid" : ""} ${type === "date" ? "is-date" : ""}`}>
       {as === "textarea" ? (
         <textarea
           name={name}
           rows={4}
+          required
           placeholder=" "
           className="qt-input qt-float-input"
           onInput={(e) => setValid(validate((e.target as HTMLTextAreaElement).value))}
@@ -445,6 +778,7 @@ function Field({
         <input
           name={name}
           type={type}
+          required
           autoComplete={autoComplete}
           placeholder=" "
           className="qt-input qt-float-input"
@@ -456,115 +790,5 @@ function Field({
         ✓
       </span>
     </label>
-  );
-}
-
-const slots = ["09:00 AM", "10:30 AM", "01:00 PM", "02:30 PM", "04:00 PM"];
-
-function nextWeekdays(count = 8) {
-  const days: Date[] = [];
-  const d = new Date();
-  while (days.length < count) {
-    d.setDate(d.getDate() + 1);
-    if (d.getDay() !== 0 && d.getDay() !== 6) days.push(new Date(d));
-  }
-  return days;
-}
-
-function BoardroomCalendar() {
-  const embed = (import.meta.env.VITE_CALENDLY_URL as string | undefined) || "";
-  const days = nextWeekdays();
-  const [day, setDay] = useState(0);
-  const [time, setTime] = useState<string | null>(null);
-  const [locked, setLocked] = useState(false);
-
-  const chosen = days[day];
-  const label = chosen.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "short",
-    day: "numeric",
-  });
-
-  return (
-    <div id="boardroom" className="qt-cal qt-ticket qt-frame relative mt-4 overflow-hidden p-4 md:mt-8 md:p-10 lg:p-14">
-      <span className="qt-step-mark">02</span>
-      <h3 className="relative font-nohemi text-[22px] font-light md:text-[44px]">
-        Step 2: Secure Your Boardroom Session
-      </h3>
-      <p className="relative mt-4 max-w-2xl font-manrope text-[14px] leading-relaxed text-[color:var(--qt-muted)] md:text-[16px]">
-        Booking below triggers a secure webhook payload of your exact calculator build and
-        operational bottlenecks directly to our engineering team.
-      </p>
-
-      {embed ? (
-        <iframe title="Boardroom calendar" src={embed} className="relative mt-10 h-[640px] w-full rounded-xl border bg-white" />
-      ) : locked && time ? (
-        <div className="lock-burst relative mt-10 rounded-2xl border border-gold/40 bg-gold/10 px-6 py-16 text-center">
-          <p className="font-mariyam text-[56px] leading-none text-gold md:text-[80px]">locked</p>
-          <p className="mt-4 font-nohemi text-[28px] font-light md:text-[40px]">{label}</p>
-          <p className="mt-2 font-manrope text-[18px] text-gold">{time}</p>
-          <p className="mx-auto mt-5 max-w-md font-manrope text-[13px] text-[color:var(--qt-muted)]">
-            Locked — {label} at {time}
-          </p>
-        </div>
-      ) : (
-        <div className="relative mt-10 grid gap-8 lg:grid-cols-12">
-          <div className="lg:col-span-7">
-            <p className="mb-4 font-manrope text-[11px] tracking-[0.22em] text-gold uppercase">
-              Select a strategy slot
-            </p>
-            <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-8 sm:gap-2">
-              {days.map((d, i) => (
-                <button
-                  key={d.toISOString()}
-                  type="button"
-                  onClick={() => {
-                    setDay(i);
-                    setTime(null);
-                    setLocked(false);
-                  }}
-                  className={`qt-day rounded-2xl px-2 py-4 text-center ${
-                    i === day ? "bg-gold text-ink" : "qt-panel"
-                  }`}
-                >
-                  <span className="block font-manrope text-[10px] tracking-widest uppercase">
-                    {d.toLocaleDateString("en-US", { weekday: "short" })}
-                  </span>
-                  <span className="mt-1 block font-nohemi text-[26px] leading-none">{d.getDate()}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-2 lg:col-span-5 lg:grid-cols-1">
-            {slots.map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => {
-                  setTime(s);
-                  setLocked(false);
-                }}
-                className={`qt-slot min-h-[50px] rounded-2xl px-3 py-3 text-left font-manrope text-[13px] md:px-5 md:py-4 md:text-[14px] ${
-                  time === s ? "bg-gold text-ink" : "qt-panel"
-                }`}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-          <div className="qt-submit-bar lg:col-span-12">
-            <button
-              type="button"
-              disabled={!time}
-              onClick={() => setLocked(true)}
-              className="hero-cta-primary w-full max-w-none disabled:opacity-40"
-            >
-              <span className="hero-cta-shine" />
-              {time ? `Confirm ${label} · ${time}` : "Choose a time to lock your session"}
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
   );
 }

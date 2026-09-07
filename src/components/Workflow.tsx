@@ -43,11 +43,11 @@ export function Workflow() {
   }, []);
 
   return (
-    <section ref={root} id="workflow" className="relative overflow-hidden bg-grey px-3 py-14 md:px-12 md:py-28">
+    <section ref={root} id="workflow" className="wf-sec relative overflow-hidden bg-ink px-3 py-14 text-white md:px-12 md:py-28">
       <p className="wf-head text-center font-manrope text-[11px] tracking-[0.28em] text-gold uppercase md:text-[12px]">
         Operational Workflow
       </p>
-      <h2 className="wf-head mt-2 text-center font-nohemi text-[28px] leading-none font-light md:mt-3 md:text-[72px]">
+      <h2 className="wf-head mt-2 text-center font-nohemi text-[28px] leading-none font-light text-white md:mt-3 md:text-[72px]">
         How It Works
       </h2>
       <p className="wf-head mx-auto mt-3 max-w-xl text-center font-manrope text-[13px] leading-relaxed text-white/70 md:mt-5 md:text-[15px]">
@@ -62,10 +62,10 @@ export function Workflow() {
             <p className="font-nohemi text-[36px] leading-none text-gold md:text-[64px]">
               {s.n}
             </p>
-            <h3 className="mt-3 font-nohemi text-[15px] leading-tight font-light md:mt-5 md:text-[26px]">
+            <h3 className="mt-3 font-nohemi text-[15px] leading-tight font-light text-white md:mt-5 md:text-[26px]">
               {s.title}
             </h3>
-            <p className="mt-2 font-manrope text-[12px] leading-snug text-white/75 md:mt-4 md:text-[14px] md:leading-relaxed">{s.copy}</p>
+            <p className="mt-2 font-manrope text-[12px] leading-snug text-white/70 md:mt-4 md:text-[14px] md:leading-relaxed">{s.copy}</p>
           </article>
         ))}
       </div>

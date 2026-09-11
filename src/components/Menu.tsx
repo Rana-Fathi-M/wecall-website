@@ -127,8 +127,8 @@ export function Menu({ open, onClose }: Props) {
           </div>
           <div>
             <p className="text-[11px] tracking-[0.22em] text-gold uppercase">Boardroom</p>
-            <a href="mailto:hello@wecall.com" className="mt-2 block text-[13px] opacity-70">
-              hello@wecall.com
+            <a href="mailto:admin@wecall247.com" className="mt-2 block text-[13px] opacity-70">
+              admin@wecall247.com
             </a>
           </div>
         </div>

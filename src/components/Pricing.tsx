@@ -61,10 +61,9 @@ export function Pricing() {
         const tip = path.getPointAtLength(len);
         gsap.set(wrap, {
           autoAlpha: 0,
-          scale: 0.2,
-          rotation: -10,
-          y: 18,
-          transformOrigin: "30% 70%",
+          scale: 0.72,
+          y: -12,
+          transformOrigin: "80% 20%",
         });
         gsap.set([path, glow].filter(Boolean), {
           strokeDasharray: len,
@@ -83,19 +82,18 @@ export function Pricing() {
         tl.to(wrap, {
           autoAlpha: 1,
           scale: 1,
-          rotation: 18,
           y: 0,
           duration: 0.55,
           ease: "power3.out",
         })
-          .to(halo, { autoAlpha: 0.85, scale: 1, duration: 0.5, ease: "power2.out" }, 0)
+          .to(halo, { autoAlpha: 0.9, scale: 1, duration: 0.5, ease: "power2.out" }, 0)
           .to(
             [path, glow].filter(Boolean),
-            { strokeDashoffset: 0, duration: 1.15, ease: "power2.inOut" },
-            0.08,
+            { strokeDashoffset: 0, duration: 1.05, ease: "power2.inOut" },
+            0.06,
           )
-          .to(head, { autoAlpha: 1, scale: 1, duration: 0.38, ease: "back.out(2.2)" }, "-=0.18")
-          .to(label, { autoAlpha: 1, y: 0, rotation: -8, duration: 0.45, ease: "power3.out" }, "-=0.55");
+          .to(head, { autoAlpha: 1, scale: 1, duration: 0.38, ease: "back.out(2.2)" }, "-=0.2")
+          .to(label, { autoAlpha: 1, y: 0, duration: 0.4, ease: "power3.out" }, "-=0.7");
 
         if (spark) {
           tl.set(spark, { autoAlpha: 1, scale: 1 }, 0.08);
@@ -243,12 +241,18 @@ export function Pricing() {
             key={t.name}
             className={`pr-card keep-dark flex h-full min-w-0 flex-col rounded-2xl border p-2 text-white md:p-7 ${
               t.featured
-                ? "pr-featured border-gold bg-gradient-to-b from-[#56423f] to-[#191d23]"
+                ? "pr-featured pr-featured-glow pr-glow-pulse border-gold"
                 : "border-white/10 bg-[#1f2329]"
             }`}
           >
+            {t.featured ? (
+              <div className="pr-offer">
+                <span>Save $1,000</span>
+                <em>next 3 clients</em>
+              </div>
+            ) : null}
             <div className="flex items-start justify-between gap-1 md:items-center md:gap-3">
-              <p className={`pr-tag font-manrope text-[7px] font-bold tracking-[0.08em] uppercase md:text-[12px] md:tracking-[0.18em] ${t.featured ? "text-gold" : "text-white/60"}`}>
+              <p className={`pr-tag font-manrope text-[7px] font-bold tracking-[0.08em] uppercase md:text-[12px] md:tracking-[0.18em] ${t.featured ? "text-[#f0d2b0]" : "text-white/60"}`}>
                 {t.tag}
               </p>
               {t.featured && <span className="pr-badge-float">Most chosen</span>}
@@ -262,13 +266,17 @@ export function Pricing() {
               {i < 2 ? (
                 <FlipPrice
                   value={cycle === "monthly" ? monthly[i] : annual[i]}
+                  compareAt={t.featured && cycle === "monthly" ? 6500 : undefined}
                   suffix={cycle === "monthly" ? "/ month" : "/ year"}
                   featured={t.featured}
                 />
               ) : (
                 <p className="pr-price font-nohemi text-[16px] leading-none text-gold md:text-[44px]">Dynamic</p>
               )}
-              <p className="mt-1 font-manrope text-[8px] text-gold/80 md:mt-2 md:text-[12px]">{t.seats}</p>
+              <p className={`pr-seats mt-1 font-manrope text-[8px] md:mt-2 md:text-[13px] ${t.featured ? "text-[#f3d6b4]" : "text-gold/80"}`}>
+                <span className="seat-pulse mr-1 inline-block h-1.5 w-1.5 rounded-full bg-gold md:h-2 md:w-2" />
+                {t.seats}
+              </p>
             </div>
 
             <p className="pr-intro mt-2 font-manrope text-[8px] leading-snug font-medium text-white/85 md:mt-5 md:text-[15px] md:leading-relaxed">{t.intro}</p>
@@ -282,7 +290,7 @@ export function Pricing() {
               ))}
             </ul>
 
-            <ClaimSeatCta wide className="pr-card-cta mt-3 md:mt-7" />
+            <ClaimSeatCta wide className="pr-card-cta mt-3 md:mt-7" tight />
           </article>
         ))}
       </div>
@@ -306,7 +314,7 @@ export function Pricing() {
 
       <div className="pr-urgency keep-dark sticky bottom-3 z-30 mx-auto mt-10 flex max-w-2xl items-center justify-between gap-3 rounded-full border border-gold/40 bg-[#1f2329] px-4 py-2.5 text-white md:bottom-5 md:px-6">
         <p className="min-w-0 font-manrope text-[11px] leading-snug md:text-[13px]">
-          2 Upcoming Millionaire seats left at $5,500
+          2 of 10 Upcoming Millionaire seats left — $1,000 off the next 3 clients
         </p>
         <ClaimSeatCta compact className="shrink-0" />
       </div>
@@ -316,10 +324,12 @@ export function Pricing() {
 
 function FlipPrice({
   value,
+  compareAt,
   suffix,
   featured,
 }: {
   value: number;
+  compareAt?: number;
   suffix: string;
   featured?: boolean;
 }) {
@@ -342,19 +352,26 @@ function FlipPrice({
   }, [value]);
 
   return (
-    <p className={`pr-price font-nohemi text-[16px] leading-none font-semibold md:text-[58px] ${featured ? "text-white" : "text-gold"}`}>
-      <span ref={ref} data-val={String(value)}>
-        ${value.toLocaleString()}
-      </span>
-      <span className="ml-0 mt-0.5 block font-manrope text-[8px] font-medium text-white/45 md:mt-0 md:ml-1 md:inline md:text-[15px]">
-        {suffix}
-      </span>
-    </p>
+    <div>
+      {compareAt ? (
+        <p className="pr-was font-manrope text-[8px] tracking-wide text-white/45 line-through md:text-[14px]">
+          ${compareAt.toLocaleString()}
+        </p>
+      ) : null}
+      <p className={`pr-price font-nohemi text-[16px] leading-none font-semibold md:text-[58px] ${featured ? "text-[#f6e2c8]" : "text-gold"}`}>
+        <span ref={ref} data-val={String(value)}>
+          ${value.toLocaleString()}
+        </span>
+        <span className="ml-0 mt-0.5 block font-manrope text-[8px] font-medium text-white/45 md:mt-0 md:ml-1 md:inline md:text-[15px]">
+          {suffix}
+        </span>
+      </p>
+    </div>
   );
 }
 
-const ARROW_PATH = "M 18 122 C 58 22, 152 18, 214 76";
-const ARROW_HEAD = "214,76 188.3,68.4 204.7,50.8";
+const ARROW_PATH = "M 198 22 C 228 58, 206 118, 64 104";
+const ARROW_HEAD = "64,104 92,90 96,118";
 
 function WowArrow({ className = "", label }: { className?: string; label?: string }) {
   const raw = useId();
@@ -383,7 +400,7 @@ function WowArrow({ className = "", label }: { className?: string; label?: strin
           className="pr-curl-glow"
           d={ARROW_PATH}
           stroke="#c49e7b"
-          strokeWidth="7"
+          strokeWidth="9"
           strokeLinecap="round"
           opacity="0.28"
           filter={`url(#${uid}-glow)`}
@@ -392,7 +409,7 @@ function WowArrow({ className = "", label }: { className?: string; label?: strin
           className="pr-curl-path"
           d={ARROW_PATH}
           stroke={`url(#${uid}-stroke)`}
-          strokeWidth="3"
+          strokeWidth="4.2"
           strokeLinecap="round"
         />
         <polygon
@@ -401,7 +418,7 @@ function WowArrow({ className = "", label }: { className?: string; label?: strin
           fill="#f0c89a"
           filter={`url(#${uid}-glow)`}
         />
-        <circle className="pr-curl-spark" r="3.5" cx="18" cy="122" fill="#fff8ee" />
+        <circle className="pr-curl-spark" r="3.5" cx="198" cy="22" fill="#fff8ee" />
       </svg>
     </span>
   );

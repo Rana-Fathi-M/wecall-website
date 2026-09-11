@@ -78,10 +78,10 @@ export function Footer() {
     <footer ref={root} className="bg-ink px-4 py-12 text-center text-white md:px-6 md:py-24">
       <BrandLogo className="ft-copy mx-auto h-14 w-auto drop-shadow-[0_0_30px_rgba(196,158,123,0.3)] md:h-20" />
       <a
-        href="mailto:hello@wecall.com"
-        className="ft-mail mt-6 block font-nohemi text-[clamp(32px,8.4vw,108px)] leading-[0.95] font-extralight tracking-tight break-all text-gold drop-shadow-[0_0_40px_rgba(196,158,123,0.25)] transition-colors hover:text-white md:mt-10"
+        href="mailto:admin@wecall247.com"
+        className="ft-mail mt-6 block font-nohemi text-[clamp(28px,7.2vw,96px)] leading-[0.95] font-extralight tracking-tight break-all text-gold drop-shadow-[0_0_40px_rgba(196,158,123,0.25)] transition-colors hover:text-white md:mt-10"
       >
-        hello@wecall.com
+        admin@wecall247.com
       </a>
       <p className="ft-copy mt-4 font-manrope text-[12px] text-white/70 md:mt-6 md:text-sm">
         Turnkey offshore acquisition desks
@@ -95,8 +95,8 @@ export function Footer() {
       </div>
 
       <div className="ft-copy mt-8 flex justify-center gap-5 md:mt-12 md:gap-6">
-        <Social href="#" src={asset("assets/icons/linkedin.svg")} label="LinkedIn" />
-        <Social href="#" src={asset("assets/icons/facebook.svg")} label="Facebook" />
+        <Social href="https://www.linkedin.com/company/146253252/" src={asset("assets/icons/linkedin.svg")} label="LinkedIn" />
+        <Social href="https://www.facebook.com/profile.php?id=61593684287739" src={asset("assets/icons/facebook.svg")} label="Facebook" />
         <Social href="#" src={asset("assets/icons/instagram.svg")} label="Instagram" />
       </div>
 
@@ -115,7 +115,7 @@ export function Footer() {
 
 function Social({ href, src, label }: { href: string; src: string; label: string }) {
   return (
-    <a href={href} aria-label={label} className="ft-social">
+    <a href={href} aria-label={label} className="ft-social" target={href.startsWith("http") ? "_blank" : undefined} rel={href.startsWith("http") ? "noreferrer" : undefined}>
       <svg className="ft-social-ring" viewBox="0 0 64 64" aria-hidden>
         <circle className="ft-social-track" cx="32" cy="32" r="30" />
         <circle className="ft-social-draw" cx="32" cy="32" r="30" />

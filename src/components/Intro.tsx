@@ -34,7 +34,7 @@ const panels = [
     size: "h-[280px] w-[380px] md:h-[600px] md:w-[720px]",
     label: "04 — The Seat Cap",
     title: "Capped Investor Seats",
-    copy: "WeCall limits client intake per quarter to protect lead quality, strict compliance, and dedicated management oversight.",
+    copy: "WeCall caps active acquisition desks at 10 so every campaign gets dedicated training, QA, and management oversight. Two Upcoming Millionaire seats are left.",
   },
 ];
 

@@ -7,17 +7,19 @@ type Props = {
   disabled?: boolean;
   className?: string;
   compact?: boolean;
+  tight?: boolean;
   wide?: boolean;
   busyLabel?: string;
   onClick?: () => void;
 };
 
 export function ClaimSeatCta({
-  to = "/apply",
+  to = "/pricing",
   type,
   disabled,
   className = "",
   compact,
+  tight,
   wide,
   busyLabel,
   onClick,
@@ -29,8 +31,16 @@ export function ClaimSeatCta({
   const inner = (
     <>
       <span className={compact ? "nav-cta-shine" : "hero-cta-shine"} />
-      <span className="cta-line">{busyLabel ?? "Claim Your Investor Seat"}</span>
-      {busyLabel ? null : <em>2 cohort seats left</em>}
+      <span className="cta-line">{busyLabel ?? (tight ? "Claim Your Seat" : "Claim Your Investor Seat")}</span>
+      {busyLabel ? null : (
+        <em>
+          {tight
+            ? "Limited discount · claim now"
+            : compact
+              ? "Limited-time discount · claim now"
+              : "Limited-time discount — claim now"}
+        </em>
+      )}
     </>
   );
 

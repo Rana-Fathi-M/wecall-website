@@ -11,21 +11,45 @@ gsap.registerPlugin(ScrollTrigger);
 const titleA = ["Secure", "Your", "Market", "Monopoly."];
 const titleB = ["Build", "Your", "Acquisition", "Desk."];
 
+const SESSION_ZONE = "America/New_York";
+const BOOKED_KEY = "wecall-booked-slots";
+const MIN_NOTICE_MS = 24 * 60 * 60 * 1000;
+
 const TIME_SLOTS = [
-  "09:00 AM",
-  "09:30 AM",
   "10:00 AM",
-  "10:30 AM",
   "11:00 AM",
-  "11:30 AM",
+  "12:00 PM",
   "01:00 PM",
-  "01:30 PM",
   "02:00 PM",
-  "02:30 PM",
   "03:00 PM",
-  "03:30 PM",
   "04:00 PM",
+  "05:00 PM",
+  "06:00 PM",
+  "07:00 PM",
+  "08:00 PM",
+  "09:00 PM",
+  "10:00 PM",
 ];
+
+function loadBookedSlots() {
+  try {
+    const raw = localStorage.getItem(BOOKED_KEY);
+    const parsed = raw ? (JSON.parse(raw) as string[]) : [];
+    return new Set(parsed);
+  } catch {
+    return new Set<string>();
+  }
+}
+
+function rememberBookedSlot(key: string) {
+  const next = loadBookedSlots();
+  next.add(key);
+  localStorage.setItem(BOOKED_KEY, JSON.stringify([...next]));
+}
+
+function slotKey(day: Date, slot: string) {
+  return `${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}|${slot}`;
+}
 
 const TIMEZONES = [
   "America/New_York",
@@ -143,8 +167,10 @@ export function Quote() {
   const [leadManager, setLeadManager] = useState(false);
   const [acq, setAcq] = useState(false);
   const [sms, setSms] = useState<"yes" | "discuss">("discuss");
+  const [includeData, setIncludeData] = useState(true);
 
-  const price = callers * 1500 + (leadManager ? 1200 : 0) + (acq ? 1800 : 0);
+  const agentRate = includeData ? 1500 : 1300;
+  const price = callers * agentRate + (leadManager ? 1700 : 0) + (acq ? 2000 : 0);
   const records = callers * 10000;
   const leads = Math.round(callers * 45);
 
@@ -306,15 +332,30 @@ export function Quote() {
               <div className="qt-mods grid grid-cols-2 gap-2 md:gap-3">
                 <ToggleModule
                   label="Dedicated Lead Manager"
-                  subtext="Filters the noise, warms the leads."
+                  subtext="CRM + dialer included · $1,700"
                   checked={leadManager}
                   onChange={setLeadManager}
                 />
                 <ToggleModule
                   label="Senior Acquisition Closer"
-                  subtext="Locks up contracts while you sleep."
+                  subtext="CRM included · $2,000"
                   checked={acq}
                   onChange={setAcq}
+                />
+              </div>
+
+              <div className="qt-mods grid grid-cols-2 gap-2 md:gap-3">
+                <ToggleModule
+                  label="Data included"
+                  subtext="Skip-traced records · $1,500 / agent"
+                  checked={includeData}
+                  onChange={setIncludeData}
+                />
+                <ToggleModule
+                  label="Exclude data"
+                  subtext="−$200 / agent · $1,300 total"
+                  checked={!includeData}
+                  onChange={(on) => setIncludeData(!on)}
                 />
               </div>
 
@@ -382,7 +423,7 @@ export function Quote() {
               </div>
               <p className="mt-3 flex items-start gap-2 font-manrope text-[10px] leading-snug tracking-[0.1em] text-gold uppercase md:mt-5 md:text-[11px] md:tracking-[0.12em]">
                 <span className="seat-pulse mt-1 inline-block h-2 w-2 shrink-0 rounded-full bg-gold" />
-                2 cohort seats left — reviewed in 24 hours
+                2 of 10 seats left — reviewed in 24 hours
               </p>
             </aside>
           </div>
@@ -394,6 +435,7 @@ export function Quote() {
           acq={acq}
           sms={sms}
           price={price}
+          includeData={includeData}
         />
       </div>
     </section>
@@ -406,18 +448,21 @@ function BoardroomBooking({
   acq,
   sms,
   price,
+  includeData,
 }: {
   callers: number;
   leadManager: boolean;
   acq: boolean;
   sms: "yes" | "discuss";
   price: number;
+  includeData: boolean;
 }) {
   const today = useMemo(() => {
-    const d = new Date();
+    const d = new Date(Date.now() + MIN_NOTICE_MS);
     d.setHours(0, 0, 0, 0);
     return d;
   }, []);
+  const [booked, setBooked] = useState(() => loadBookedSlots());
 
   const zones = useMemo(() => {
     const local = detectedTimezone();
@@ -425,7 +470,7 @@ function BoardroomBooking({
   }, []);
 
   const [day, setDay] = useState<Date | undefined>();
-  const [timezone, setTimezone] = useState("");
+  const [timezone, setTimezone] = useState(SESSION_ZONE);
   const [time, setTime] = useState<string | null>(null);
   const [view, setView] = useState(1);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
@@ -433,7 +478,7 @@ function BoardroomBooking({
 
   const conversion = useMemo(() => {
     if (!day || !timezone || !time) return null;
-    const instant = wallTimeToDate(day, time, timezone);
+    const instant = wallTimeToDate(day, time, SESSION_ZONE);
     return {
       guest: formatInZone(instant, timezone),
       owner: formatInZone(instant, OWNER_TIMEZONE),
@@ -449,7 +494,7 @@ function BoardroomBooking({
 
   const onPickDay = (next?: Date) => {
     setDay(next);
-    setTimezone("");
+    setTimezone((zone) => zone || SESSION_ZONE);
     setTime(null);
     setStatus("idle");
     setError("");
@@ -474,8 +519,8 @@ function BoardroomBooking({
     const market = String(form.get("market") || "");
     const bottleneck = String(form.get("bottleneck") || "");
 
-    if (!isName(name) || !isEmail(email) || !isPhone(phone) || !isLong(market) || !isLong(bottleneck)) {
-      setError("Complete every field before locking the session.");
+    if (!isName(name) || !isEmail(email) || !isPhone(phone)) {
+      setError("Name, email, and phone are required to lock the session.");
       return;
     }
 
@@ -502,7 +547,10 @@ function BoardroomBooking({
         closer: acq,
         sms: sms === "yes" ? "Inject into Build" : "Discuss on Consult",
         price,
+        dataIncluded: includeData,
       });
+      rememberBookedSlot(slotKey(day, time));
+      setBooked(loadBookedSlots());
       setStatus("sent");
     } catch (err) {
       setStatus("error");
@@ -515,15 +563,15 @@ function BoardroomBooking({
       <span className="qt-step-mark">0{step}</span>
       <p className="relative mb-2 flex items-center gap-2 font-manrope text-[11px] font-bold tracking-[0.22em] text-gold uppercase">
         <span className="seat-pulse inline-block h-2 w-2 rounded-full bg-gold" />
-        2 cohort seats left — reviewed in 24 hours
+        2 of 10 seats left — reviewed in 24 hours
       </p>
       <h3 className="relative font-nohemi text-[28px] leading-[0.95] font-semibold md:text-[48px]">
         Secure Your Boardroom Session
       </h3>
       <span className="relative mt-4 block h-px w-14 bg-gold/50" />
       <p className="relative mt-4 max-w-2xl font-manrope text-[16px] leading-relaxed font-medium text-[color:var(--qt-muted)] md:text-[19px]">
-        Pick a weekday, confirm the timezone, lock a time, then send the brief. The full desk build
-        travels with the booking.
+        Weekdays only, U.S. Eastern Time, 10 AM–10 PM. Book at least 24 hours ahead. One-hour slots,
+        no double booking. Name, email, and phone lock the session — the rest is optional.
       </p>
 
       <ol className="qt-book-steps relative mt-8">
@@ -571,7 +619,7 @@ function BoardroomBooking({
                 Step 01 · Select a weekday
               </p>
               <p className="mb-5 font-manrope text-[15px] text-[color:var(--qt-muted)]">
-                Weekdays only. Tap a date to continue.
+                Weekdays only. Earliest bookable day is 24 hours from now.
               </p>
               <DayPicker
                 mode="single"
@@ -591,7 +639,7 @@ function BoardroomBooking({
                 Step 02 · Confirm timezone
               </p>
               <p className="mb-5 font-manrope text-[15px] text-[color:var(--qt-muted)]">
-                {day ? formatDay(day) : "Pick your working timezone."}
+                Sessions are held in U.S. Eastern Time (10 AM–10 PM). Confirm how you want that shown.
               </p>
               <label className="block">
                 <span className="sr-only">Timezone</span>
@@ -622,25 +670,34 @@ function BoardroomBooking({
                 Step 03 · Lock a time
               </p>
               <p className="mb-5 font-manrope text-[15px] text-[color:var(--qt-muted)]">
-                {day ? formatDay(day) : ""} · {timezone ? timezoneLabel(timezone) : ""}
+                {day ? formatDay(day) : ""} · Eastern Time · 1 hour between sessions
               </p>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {TIME_SLOTS.map((slot) => (
-                  <button
-                    key={slot}
-                    type="button"
-                    onClick={() => {
-                      setTime(slot);
-                      setStatus("idle");
-                      setView(4);
-                    }}
-                    className={`qt-slot min-h-[50px] rounded-xl px-3 py-3 text-center font-manrope text-[15px] font-medium ${
-                      time === slot ? "bg-gold text-ink" : "border border-[color:var(--qt-line)]"
-                    }`}
-                  >
-                    {slot}
-                  </button>
-                ))}
+                {TIME_SLOTS.map((slot) => {
+                  const instant = day ? wallTimeToDate(day, slot, SESSION_ZONE) : null;
+                  const tooSoon = instant ? instant.getTime() < Date.now() + MIN_NOTICE_MS : true;
+                  const taken = day ? booked.has(slotKey(day, slot)) : false;
+                  const blocked = tooSoon || taken;
+                  return (
+                    <button
+                      key={slot}
+                      type="button"
+                      disabled={blocked}
+                      onClick={() => {
+                        if (blocked) return;
+                        setTime(slot);
+                        setStatus("idle");
+                        setView(4);
+                      }}
+                      className={`qt-slot min-h-[50px] rounded-xl px-3 py-3 text-center font-manrope text-[15px] font-medium ${
+                        time === slot ? "bg-gold text-ink" : "border border-[color:var(--qt-line)]"
+                      } disabled:cursor-not-allowed disabled:opacity-35`}
+                    >
+                      {slot} ET
+                      {taken ? " · booked" : ""}
+                    </button>
+                  );
+                })}
               </div>
               <div className="qt-wizard-nav">
                 <button type="button" className="qt-back" onClick={() => goTo(2)}>
@@ -665,8 +722,8 @@ function BoardroomBooking({
                 <Field label="Phone Number" name="phone" type="tel" autoComplete="tel" validate={isPhone} />
               </div>
 
-              <Field label="Target Market & Buy-Box" name="market" as="textarea" validate={isLong} />
-              <Field label="Core Operational Bottleneck" name="bottleneck" as="textarea" validate={isLong} />
+              <Field label="Target Market & Buy-Box (optional)" name="market" as="textarea" required={false} validate={() => true} />
+              <Field label="Core Operational Bottleneck (optional)" name="bottleneck" as="textarea" required={false} validate={() => true} />
 
               {error ? (
                 <p className="font-manrope text-[13px] text-red-400">{error}</p>
@@ -787,7 +844,6 @@ function ToggleModule({
 const isName = (v: string) => v.trim().length >= 2;
 const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 const isPhone = (v: string) => v.replace(/\D/g, "").length >= 10;
-const isLong = (v: string) => v.trim().length >= 12;
 
 function Field({
   label,
@@ -796,6 +852,7 @@ function Field({
   as,
   autoComplete,
   validate,
+  required = true,
 }: {
   label: string;
   name: string;
@@ -803,6 +860,7 @@ function Field({
   as?: "textarea";
   autoComplete?: string;
   validate: (value: string) => boolean;
+  required?: boolean;
 }) {
   const [valid, setValid] = useState(false);
 
@@ -812,7 +870,7 @@ function Field({
         <textarea
           name={name}
           rows={4}
-          required
+          required={required}
           placeholder=" "
           className="qt-input qt-float-input"
           onInput={(e) => setValid(validate((e.target as HTMLTextAreaElement).value))}
@@ -821,7 +879,7 @@ function Field({
         <input
           name={name}
           type={type}
-          required
+          required={required}
           autoComplete={autoComplete}
           placeholder=" "
           className="qt-input qt-float-input"

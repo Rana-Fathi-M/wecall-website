@@ -120,7 +120,7 @@ export const pricingRows = [
   ["Multi-Line Predictive Dialer License", "Included", "Included", "Included"],
   ["4-Pillars QA Lead Verification", "Real-Time Monitoring", "Real-Time QA Voice Monitoring & Daily Coaching", "Included"],
   ["CRM Integration & Follow-up Workflows", "Included", "Included", "Included"],
-  ["Allocations Available", "Limited", "2 Cohort Seats Left", "Open"],
+  ["Allocations Available", "Limited", "2 of 10 seats left", "Open"],
 ];
 
 export const tiers = [
@@ -148,9 +148,9 @@ export const tiers = [
     name: "Upcoming Millionaire",
     price: "$5,500",
     period: "/ month",
-    tag: "Limited-time offer — regularly $6,000/mo",
+    tag: "Next 3 clients: $1,000 off — regularly $6,500/mo",
     cta: "Lock In $5,500 Discount",
-    seats: "2 Cohort Seats Left",
+    seats: "2 of 10 seats left",
     featured: true,
     headline: "The Complete Acquisition Desk",
     intro:
@@ -189,27 +189,27 @@ export const tiers = [
 
 export const timeline = [
   {
-    year: "7 yrs",
-    title: "High-ticket sales leadership",
-    copy: "WeCall was founded on over 7 years of high-ticket sales leadership — not a generic BPO or outsourcing middleman.",
+    year: "Founded",
+    title: "Active U.S. acquisition managers",
+    copy: "WeCall wasn't built by standard outsourcing middlemen. It was founded by active U.S. real estate acquisition managers who spent years perfecting deal-sourcing.",
     photo: photos.nightDesk,
   },
   {
-    year: "3 yrs",
-    title: "Inside U.S. acquisitions",
-    copy: "Three dedicated years operating directly inside U.S. real estate acquisitions, dispositions, and real estate project management.",
+    year: "45",
+    title: "Leads per agent",
+    copy: "Veteran acquisition training delivers an average benchmark of 45 high-converting leads per agent, with market-specific coaching.",
     photo: photos.office,
   },
   {
-    year: "Desk",
-    title: "Egyptian calling desks",
-    copy: "Turnkey offshore desks for wholesalers, flippers, and rental investors who need clean data and real seller motivation.",
+    year: "14d",
+    title: "Onboarding + data ownership",
+    copy: "Swift 14-day onboarding, 100% data ownership on your end, and strict security protocols around lists, contracts, and seller files.",
     photo: photos.desks,
   },
   {
-    year: "Now",
+    year: "10",
     title: "Capped investor seats",
-    copy: "WeCall limits client intake to a capped number of active investor seats per quarter to protect lead quality and compliance.",
+    copy: "WeCall enforces a strict limit of 10 active acquisition desks at a time. Two Upcoming Millionaire cohort seats are left.",
     photo: photos.seats,
   },
 ];

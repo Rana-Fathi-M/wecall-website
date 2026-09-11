@@ -1,11 +1,13 @@
-import { AboutSlideshow } from "../components/AboutSlideshow";
+import { AboutNarrative } from "../components/AboutNarrative";
 import { HeroSlider } from "../components/HeroSlider";
+import { TrackRecord } from "../components/TrackRecord";
 
 export function AboutPage() {
   return (
     <main>
       <HeroSlider />
-      <AboutSlideshow />
+      <AboutNarrative />
+      <TrackRecord />
     </main>
   );
 }

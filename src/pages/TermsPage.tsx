@@ -86,7 +86,7 @@ const sections = [
     n: "10",
     title: "Contact",
     body: [
-      "Questions about these Terms or a booking: hello@wecall.com.",
+      "Questions about these Terms or a booking: admin@wecall247.com.",
       "Governing law: the laws applicable to WeCall’s operating entity, without regard to conflict-of-law rules. Courts of competent jurisdiction there have exclusive venue, unless a consumer statute requires otherwise.",
     ],
   },

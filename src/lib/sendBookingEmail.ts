@@ -19,6 +19,7 @@ export type BookingPayload = {
   closer: boolean;
   sms: string;
   price: number;
+  dataIncluded: boolean;
 };
 
 function requiredEnv(name: "VITE_EMAILJS_SERVICE_ID" | "VITE_EMAILJS_TEMPLATE_ID" | "VITE_EMAILJS_PUBLIC_KEY") {
@@ -50,6 +51,7 @@ export async function sendBookingEmail(data: BookingPayload) {
       lead_manager: data.leadManager ? "Yes" : "No",
       closer: data.closer ? "Yes" : "No",
       sms: data.sms,
+      data_included: data.dataIncluded ? "Included" : "Excluded (−$200 / agent)",
       price: `$${data.price.toLocaleString()}/mo`,
     },
     { publicKey: requiredEnv("VITE_EMAILJS_PUBLIC_KEY") },

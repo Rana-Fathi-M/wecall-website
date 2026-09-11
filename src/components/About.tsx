@@ -44,7 +44,7 @@ export function About() {
       const threeEl = root.current?.querySelector(".ab-n3");
 
       gsap.to(seven, {
-        n: 7,
+        n: 10,
         duration: 1.4,
         ease: "power2.out",
         scrollTrigger: { trigger: ".ab-stats", start: "top 82%" },
@@ -54,13 +54,13 @@ export function About() {
       });
 
       gsap.to(three, {
-        n: 3,
+        n: 45,
         duration: 1.2,
         delay: 0.15,
         ease: "power2.out",
         scrollTrigger: { trigger: ".ab-stats", start: "top 82%" },
         onUpdate: () => {
-          if (threeEl) threeEl.textContent = String(Math.round(three.n)).padStart(2, "0");
+          if (threeEl) threeEl.textContent = String(Math.round(three.n));
         },
       });
 
@@ -174,10 +174,10 @@ export function About() {
               00
             </p>
             <p className="mt-3 font-manrope text-[11px] tracking-[0.2em] text-white/55 uppercase">
-              Years
+              Desks
             </p>
             <p className="mt-2 font-manrope text-[14px] leading-snug text-white/90 md:text-[16px]">
-              High-ticket sales leadership
+              Active acquisition seats at a time
             </p>
           </article>
           <article className="ab-stat rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur-sm md:p-8">
@@ -185,10 +185,10 @@ export function About() {
               00
             </p>
             <p className="mt-3 font-manrope text-[11px] tracking-[0.2em] text-white/55 uppercase">
-              Years
+              Leads
             </p>
             <p className="mt-2 font-manrope text-[14px] leading-snug text-white/90 md:text-[16px]">
-              Inside U.S. acquisitions
+              Average high-converting leads per agent
             </p>
           </article>
         </div>
@@ -230,21 +230,19 @@ export function About() {
 
             <div className="mt-4 space-y-3 font-manrope text-[13px] leading-[1.55] text-white/88 md:mt-6 md:space-y-5 md:text-[18px] md:leading-[1.65]">
               <p>
-                WeCall wasn&apos;t built by a generic BPO agency or outsourcing middleman. It was founded on
-                over 7 years of high-ticket sales leadership, with 3 dedicated years operating directly
-                inside U.S. real estate acquisitions, dispositions, and real estate project management.
+                WeCall wasn&apos;t built by standard outsourcing middlemen. It was founded by active U.S.
+                real estate acquisition managers who spent years inside the industry researching, testing,
+                and perfecting the science of deal-sourcing.
               </p>
               <p>
-                Having managed deals across wholesaling, fix-and-flips, and rental acquisitions from list
-                generation to closed escrow, our founder understands what acquisition managers actually
-                need:{" "}
+                Having closed deals across wholesaling, fix-and-flips, and rental acquisitions, our team
+                identified every major flaw in traditional BPOs—from poor data quality and unvetted leads
+                to robotic callers. We engineered WeCall to fix those exact breakdowns, equipping
+                investors with{" "}
                 <strong className="font-semibold text-white">
-                  clean data, clear seller motivation, realistic price expectations, and immediate
-                  follow-up
-                </strong>
-                . We know the difference between a tire-kicker who just wants to hear an offer and a truly
-                distressed seller who needs to liquidate. Every process, script, and QA checklist at
-                WeCall is built from real-world acquisition experience.
+                  clean data, true seller motivation, and real-world acquisition standards
+                </strong>{" "}
+                built from hands-on closing experience.
               </p>
             </div>
 

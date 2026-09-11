@@ -165,7 +165,7 @@ export function Hero() {
       });
 
       /*
-       * Images leave fully, then Exclusive / WeCall lifts right away.
+       * Images leave fully, then WeCall / Investments lifts right away.
        */
       scrollTl.to({}, { duration: mobile ? 0.03 : 0.08 });
 
@@ -386,7 +386,7 @@ export function Hero() {
                 hero-img
                 hero-img-stairs
                 absolute
-                top-0
+                top-[7.5rem]
                 left-[16%]
                 z-0
                 h-[12vw]
@@ -425,30 +425,31 @@ export function Hero() {
               className="
                 hero-word
                 font-nohemi
-                text-[18vw]
+                text-[16vw]
                 leading-[0.9]
                 font-extralight
                 tracking-[-0.02em]
                 text-gold
-                md:text-[14.375vw]
-                lg:text-[230px]
+                md:text-[12vw]
+                lg:text-[200px]
               "
             >
-              Exclusive
+              WeCall
             </h1>
 
             <p
               className="
                 hero-script
-                font-mariyam
-                -mt-[0.38em]
-                text-[18vw]
+                font-priestacy
+                -mt-[0.18em]
+                text-[10vw]
                 leading-none
                 text-white
-                md:text-[170px]
+                md:text-[100px]
+                lg:text-[118px]
               "
             >
-              WeCall
+              Investments
             </p>
           </div>
 
@@ -525,7 +526,7 @@ export function Hero() {
               <div className="flex w-full max-w-[420px] flex-col items-stretch justify-center gap-3 sm:max-w-[520px] md:w-auto md:max-w-none md:flex-row md:items-center">
                 <ClaimSeatCta />
                 <Link to="/pricing" className="hero-cta-ghost">
-                  Build My Custom Desk
+                  Build Your Custom Desk
                 </Link>
               </div>
             </div>

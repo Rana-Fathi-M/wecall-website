@@ -190,14 +190,30 @@ export function HeroSlider() {
       }
     };
 
-    window.addEventListener("mousemove", onMove);
+    node.addEventListener("mousemove", onMove);
     node.addEventListener("mouseleave", reset);
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        running = entry.isIntersecting;
+        if (!running) {
+          clearTimeout(flipTimeout);
+          isFlipping = false;
+        } else if (!isFlipping) {
+          clearTimeout(flipTimeout);
+          flipTimeout = setTimeout(flip, 2200);
+        }
+      },
+      { threshold: 0.35 },
+    );
+    io.observe(node);
 
     return () => {
       running = false;
       clearTimeout(start);
       clearTimeout(flipTimeout);
-      window.removeEventListener("mousemove", onMove);
+      io.disconnect();
+      node.removeEventListener("mousemove", onMove);
       node.removeEventListener("mouseleave", reset);
       gsap.killTweensOf([rig, card, track]);
     };
@@ -206,7 +222,7 @@ export function HeroSlider() {
   return (
     <section
       ref={root}
-      className="ah-hero relative flex h-screen w-full items-center justify-center overflow-visible"
+      className="ah-hero relative isolate flex h-[100svh] w-full items-center justify-center overflow-hidden"
       style={{ perspective: "800px" }}
     >
       <div className="ah-blueprint pointer-events-none absolute inset-0" />

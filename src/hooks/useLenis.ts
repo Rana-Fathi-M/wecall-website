@@ -9,6 +9,12 @@ gsap.registerPlugin(ScrollTrigger);
 
 export function useLenis() {
   useEffect(() => {
+    const touch = window.matchMedia("(pointer: coarse)").matches;
+    if (touch) {
+      requestAnimationFrame(() => ScrollTrigger.refresh());
+      return;
+    }
+
     const lenis = new Lenis({
       duration: 0.9,
       smoothWheel: true,

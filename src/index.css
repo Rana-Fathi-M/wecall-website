@@ -1106,6 +1106,10 @@ html.light .ft-social-draw {
   background: #191d23;
 }
 
+.pr-head {
+  perspective: 800px;
+}
+
 .pr-section .pr-title,
 .pr-section .pr-card h3,
 .qt-section .qt-head h2,
@@ -1217,8 +1221,54 @@ html.light .pr-wow-label {
 }
 
 @media (max-width: 767px) {
+  .pr-ambient,
+  .pr-wow-halo,
+  .pr-curl-glow,
+  .pr-curl-spark {
+    display: none;
+  }
+
+  .pr-head {
+    perspective: none;
+  }
+
+  .pr-wow-arrow .pr-curl {
+    filter: none;
+  }
+
   .pr-wow-label {
     font-size: 15px;
+    text-shadow: none;
+  }
+
+  .pr-featured-glow,
+  .pr-glow-pulse,
+  .pr-featured {
+    animation: none !important;
+    box-shadow: 0 0 0 1px rgba(196, 158, 123, 0.4);
+  }
+
+  .pr-section .pr-badge-float,
+  .pr-section .seat-pulse {
+    animation: none;
+  }
+
+  .pr-urgency {
+    position: static;
+    bottom: auto;
+  }
+
+  .pr-section .marquee-track {
+    animation: none;
+    width: 100%;
+    max-width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    transform: none;
+  }
+
+  .pr-section .pr-stack-dup {
+    display: none;
   }
 
   .pr-arrow-escrow {

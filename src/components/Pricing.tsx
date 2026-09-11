@@ -21,6 +21,16 @@ export function Pricing() {
     if (!node) return;
 
     const ctx = gsap.context(() => {
+      const mobile = window.matchMedia("(max-width: 767px)").matches;
+
+      if (mobile) {
+        const joinedEl = node.querySelector(".pr-joined");
+        if (joinedEl) joinedEl.textContent = "23";
+        gsap.set(".pr-bar", { scaleX: 0.92 });
+        gsap.set(".pr-arrow-escrow", { autoAlpha: 1, clearProps: "transform" });
+        return;
+      }
+
       gsap.from(".pr-kicker", {
         y: 24,
         opacity: 0,
@@ -160,9 +170,9 @@ export function Pricing() {
 
   return (
     <section ref={root} id="pricing" className="pr-section relative overflow-x-clip px-3 pb-24 pt-14 md:px-6 md:pb-32 md:pt-28">
-      <div className="pointer-events-none absolute top-0 left-1/2 -z-10 h-[420px] w-[90vw] max-w-[980px] -translate-x-1/2 rounded-full bg-gold/12 blur-[120px]" />
+      <div className="pr-ambient pointer-events-none absolute top-0 left-1/2 -z-10 h-[420px] w-[90vw] max-w-[980px] -translate-x-1/2 rounded-full bg-gold/12 blur-[120px]" />
 
-      <div className="relative z-10 mx-auto max-w-6xl text-center" style={{ perspective: "800px" }}>
+      <div className="pr-head relative z-10 mx-auto max-w-6xl text-center">
         <span className="pr-kicker mb-4 inline-block rounded-full border border-gold bg-gold px-5 py-1.5 font-manrope text-[13px] font-extrabold tracking-[0.22em] text-ink uppercase md:text-[15px]">
           The End of Dead Leads
         </span>
@@ -301,7 +311,7 @@ export function Pricing() {
         </p>
         <div className="marquee-track flex w-max items-center font-manrope text-[16px] font-medium tracking-[0.16em] text-white/50 uppercase md:text-[20px]">
           {Array.from({ length: 4 }).map((_, i) => (
-            <span key={i} className="flex items-center">
+            <span key={i} className={`flex items-center${i > 0 ? " pr-stack-dup" : ""}`}>
               {stacks.map((s) => (
                 <span key={`${i}-${s}`} className="px-6">
                   {s}

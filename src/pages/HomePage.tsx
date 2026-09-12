@@ -5,7 +5,7 @@ import { FillText } from "../components/FillText";
 import { Strategies } from "../components/Strategies";
 import { Difference } from "../components/Difference";
 import { Services } from "../components/Services";
-import { AudioPolicy } from "../components/AudioPolicy";
+// import { AudioPolicy } from "../components/AudioPolicy";
 import { Workflow } from "../components/Workflow";
 import { About } from "../components/About";
 import { TrackRecord } from "../components/TrackRecord";
@@ -22,7 +22,7 @@ export function HomePage() {
       <TrustBar />
       <Difference />
       <Services />
-      <AudioPolicy />
+      {/* <AudioPolicy /> */}
       <Workflow />
       <About />
       <TrackRecord />

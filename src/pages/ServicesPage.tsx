@@ -1,6 +1,6 @@
 import { services } from "../data";
 import { Workflow } from "../components/Workflow";
-import { AudioPolicy } from "../components/AudioPolicy";
+// import { AudioPolicy } from "../components/AudioPolicy";
 import { ThemePhoto } from "../components/ThemePhoto";
 import { asset, photos } from "../media";
 import { ClaimSeatCta } from "../components/ClaimSeatCta";
@@ -58,7 +58,7 @@ export function ServicesPage() {
       </section>
 
       <Workflow />
-      <AudioPolicy />
+      {/* <AudioPolicy /> */}
     </main>
   );
 }

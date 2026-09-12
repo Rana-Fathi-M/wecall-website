@@ -13,7 +13,7 @@ const sections = [
     n: "01",
     title: "Who these terms cover",
     body: [
-      "These Terms & Conditions (“Terms”) govern access to WeCall.com and any application, boardroom session, or turnkey offshore acquisition desk we discuss or deliver.",
+      "These Terms & Conditions (“Terms”) govern access to WeCall.com and any application, strategy session, or turnkey offshore acquisition desk we discuss or deliver.",
       "By using this site, submitting a booking, or starting a desk engagement, you agree to these Terms. If you do not agree, do not use the site or send an application.",
     ],
   },
@@ -27,11 +27,11 @@ const sections = [
   },
   {
     n: "03",
-    title: "Applications and boardroom sessions",
+    title: "Applications and strategy sessions",
     body: [
       "A calendar booking is a request for a private strategy / integration mapping session. It is not a signed service contract and does not reserve a seat until we confirm in writing.",
-      "Live times come from our Calendly calendar. A booked hour is locked for other visitors. If you or WeCall cancel that meeting in Calendly, the hour becomes available on the site again.",
-      "You agree that the information you submit (name, contact details, market, buy-box, bottleneck, and desk configuration) is accurate and may be emailed to our intake inbox so we can prepare for the call.",
+      "Live times come from our Google Calendar / Calendly integration. A booked hour is locked for other visitors. If you or WeCall cancel that meeting in the calendar system, the hour becomes available on the site again.",
+      "You agree that the information you submit (name, contact details, market, buy-box, bottleneck, and desk configuration) is accurate and may be transmitted via webhook to our intake inbox so we can prepare for the call.",
     ],
   },
   {
@@ -68,26 +68,21 @@ const sections = [
   },
   {
     n: "08",
-    title: "Limitation of liability",
+    title: "Site use",
     body: [
-      "To the fullest extent allowed by law, WeCall is not liable for lost profits, lost deals, or indirect damages arising from use of the site or a consult.",
-      "If liability cannot be excluded, it is limited to the fees you actually paid us in the three months before the claim, or one hundred U.S. dollars if you have paid nothing.",
+      "You may not scrape, copy, or reverse-engineer the site except as allowed by law. Trademarks, copy, and design remain WeCall’s property.",
+      "The site is provided “as is.” We may update pages, pricing, or these Terms at any time. The “Last updated” date at the top indicates the current version.",
     ],
   },
   {
     n: "09",
-    title: "Site use",
+    title: "Contact & governing law",
     body: [
-      "You may not scrape, copy, or reverse-engineer the site except as allowed by law. Trademarks, copy, and design remain WeCall’s property.",
-      "The site is provided “as is.” We may update pages, pricing, or these Terms at any time. The “Last updated” date at the top is the current version.",
-    ],
-  },
-  {
-    n: "10",
-    title: "Contact",
-    body: [
-      "Questions about these Terms or a booking: admin@wecall247.com.",
-      "Governing law: the laws applicable to WeCall’s operating entity, without regard to conflict-of-law rules. Courts of competent jurisdiction there have exclusive venue, unless a consumer statute requires otherwise.",
+      "Questions about these Terms or a booking: admin@wecall247.com",
+      "Governing law: The laws applicable to WeCall’s operating entity, without regard to conflict-of-law rules. Courts of competent jurisdiction there have exclusive venue, unless a consumer statute requires otherwise.",
+      "Contact Email: admin@wecall247.com",
+      "Website: https://wecall.com",
+      "Service: Lead generation and turnkey offshore acquisition desks for U.S. real estate investors",
     ],
   },
 ];
@@ -170,7 +165,7 @@ export function TermsPage() {
             Terms & Conditions
           </h1>
           <p className="tm-lede mx-auto mt-5 max-w-xl font-manrope text-[16px] leading-relaxed md:text-[18px]">
-            The rules for using WeCall, booking a boardroom session, and engaging a turnkey
+            The rules for using WeCall, booking a strategy session, and engaging a turnkey
             acquisition desk.
           </p>
         </div>
@@ -195,6 +190,9 @@ export function TermsPage() {
               </div>
             </article>
           ))}
+          <p className="pt-4 text-center font-manrope text-[13px] text-white/50">
+            © 2026 WeCall.com. All Rights Reserved.
+          </p>
         </div>
       </section>
     </main>

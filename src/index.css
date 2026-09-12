@@ -430,20 +430,21 @@ html.light .nav-theme {
     width: 32px;
   }
 
-  .nav-cta {
+  .site-header .nav-cta {
     min-height: 0;
-    padding: 6px 10px 5px;
-    font-size: 7px;
-    letter-spacing: 0.06em;
+    padding: 7px 12px;
+    font-size: 8px;
+    letter-spacing: 0.07em;
+    white-space: nowrap;
   }
 
-  .nav-cta .cta-line {
-    max-width: 92px;
+  .site-header .nav-cta .cta-line {
+    max-width: none;
   }
 
-  .nav-cta em {
-    font-size: 6px;
-    letter-spacing: 0.1em;
+  .site-header .nav-cta em,
+  .site-header .nav-cta-shine {
+    display: none;
   }
 }
 
@@ -1249,8 +1250,20 @@ html.light .pr-wow-label {
   }
 
   .pr-section .pr-badge-float,
-  .pr-section .seat-pulse {
-    animation: none;
+  .pr-section .seat-pulse,
+  .pr-section .hero-cta-primary,
+  .pr-section .hero-cta-shine::after {
+    animation: none !important;
+  }
+
+  .st-card:hover,
+  .st-card:hover .st-card-img {
+    transform: none;
+  }
+
+  .st-card:hover::before,
+  .st-card:hover .st-card-line {
+    transform: none;
   }
 
   .pr-urgency {
@@ -3267,18 +3280,57 @@ html.light .qt-input[type="date"] {
   .pr-card .hero-cta-primary {
     width: 100%;
     min-width: 0;
-    min-height: 54px;
-    padding: 11px 8px 10px;
+    min-height: 34px;
+    padding: 8px 6px;
     font-size: 9px;
     letter-spacing: 0.04em;
     margin-top: 8px !important;
-    animation: none;
+    box-shadow: none;
+    animation: none !important;
   }
 
-  .pr-card .hero-cta-primary em {
-    margin-top: 3px;
-    font-size: 7px;
+  .pr-card .hero-cta-primary em,
+  .pr-card .hero-cta-shine {
+    display: none;
+  }
+
+  .site-header .nav-cta {
+    padding: 7px 12px;
+    font-size: 8px;
+    letter-spacing: 0.07em;
+    white-space: nowrap;
+  }
+
+  .site-header .nav-cta .cta-line {
+    max-width: none;
+  }
+
+  .site-header .nav-cta em,
+  .site-header .nav-cta-shine {
+    display: none;
+  }
+
+  .pr-urgency .nav-cta {
+    padding: 6px 10px 5px;
+    font-size: 8px;
     letter-spacing: 0.06em;
+    line-height: 1.15;
+    white-space: normal;
+  }
+
+  .pr-urgency .nav-cta .cta-line {
+    max-width: 108px;
+  }
+
+  .pr-urgency .nav-cta em {
+    display: block;
+    margin-top: 2px;
+    font-size: 6px;
+    letter-spacing: 0.08em;
+  }
+
+  .pr-urgency .nav-cta-shine {
+    display: none;
   }
 
   .pr-card .pr-badge-float {

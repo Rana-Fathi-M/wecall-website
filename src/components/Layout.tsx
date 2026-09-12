@@ -17,6 +17,11 @@ export function Layout() {
       window.history.scrollRestoration = "manual";
     }
     scrollToTop(false);
+    const mobile = window.matchMedia("(max-width: 767px)").matches;
+    if (mobile) {
+      requestAnimationFrame(() => ScrollTrigger.refresh());
+      return;
+    }
     const timer = window.setTimeout(() => {
       scrollToTop(false);
       requestAnimationFrame(() => ScrollTrigger.refresh());

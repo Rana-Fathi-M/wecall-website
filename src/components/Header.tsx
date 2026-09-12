@@ -16,7 +16,8 @@ export function Header({ onOpenMenu }: Props) {
     let last = window.scrollY;
     const onScroll = () => {
       const y = window.scrollY;
-      setHidden(y > last && y > 90);
+      const mobile = window.matchMedia("(max-width: 767px)").matches;
+      setHidden(!mobile && y > last && y > 90);
       setScrolled(y > 16);
       last = y;
     };
@@ -47,7 +48,7 @@ export function Header({ onOpenMenu }: Props) {
 
         <div className="nav-side nav-side-right">
           <ThemeToggle />
-          <ClaimSeatCta compact />
+          <ClaimSeatCta compact tight />
         </div>
       </div>
     </header>

@@ -14,6 +14,8 @@ export function Strategies() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      if (window.matchMedia("(max-width: 767px)").matches) return;
+
       gsap.from(".st-heading", {
         y: 46,
         opacity: 0,
@@ -67,7 +69,7 @@ export function Strategies() {
           </p>
         </div>
 
-        <div className="st-grid mt-8 grid grid-cols-4 items-stretch gap-2 px-3 pb-6 md:mt-14 md:gap-4 md:px-8 md:pb-8">
+        <div className="st-grid mt-8 grid grid-cols-2 items-stretch gap-2 px-3 pb-6 md:mt-14 md:grid-cols-4 md:gap-4 md:px-8 md:pb-8">
           {strategies.map((s, i) => (
             <article
               key={s.title}
@@ -93,7 +95,7 @@ export function Strategies() {
                   light={s.photo.light}
                   dark={s.photo.dark}
                   alt={s.title}
-                  className="st-card-img h-20 w-full object-cover sm:h-28 md:h-52"
+                  className="st-card-img h-28 w-full object-cover md:h-52"
                 />
               </div>
 

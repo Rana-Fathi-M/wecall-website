@@ -322,11 +322,11 @@ export function Pricing() {
         </div>
       </div>
 
-      <div className="pr-urgency keep-dark sticky bottom-3 z-30 mx-auto mt-10 flex max-w-2xl items-center justify-between gap-3 rounded-full border border-gold/40 bg-[#1f2329] px-4 py-2.5 text-white md:bottom-5 md:px-6">
+      <div className="pr-urgency keep-dark relative z-30 mx-auto mt-10 flex max-w-2xl items-center justify-between gap-3 rounded-full border border-gold/40 bg-[#1f2329] px-3 py-2 text-white md:sticky md:bottom-5 md:px-6 md:py-2.5">
         <p className="min-w-0 font-manrope text-[11px] leading-snug md:text-[13px]">
           2 of 10 Upcoming Millionaire seats left — $1,000 off the next 3 clients
         </p>
-        <ClaimSeatCta compact className="shrink-0" />
+        <ClaimSeatCta compact tight className="shrink-0" />
       </div>
     </section>
   );
@@ -348,6 +348,11 @@ function FlipPrice({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    if (window.matchMedia("(max-width: 767px)").matches) {
+      el.textContent = `$${value.toLocaleString()}`;
+      el.dataset.val = String(value);
+      return;
+    }
     const current = Number(el.dataset.val || 0);
     const state = { n: current || value };
     gsap.to(state, {

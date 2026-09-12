@@ -176,6 +176,8 @@ export function Quote() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      if (window.matchMedia("(max-width: 767px)").matches) return;
+
       gsap.from(".qt-word", {
         y: 90,
         opacity: 0,
@@ -237,6 +239,11 @@ export function Quote() {
   useEffect(() => {
     const tween = (el: HTMLElement | null, value: number, prefix = "", suffix = "") => {
       if (!el) return;
+      if (window.matchMedia("(max-width: 767px)").matches) {
+        el.textContent = `${prefix}${value.toLocaleString()}${suffix}`;
+        el.dataset.val = String(value);
+        return;
+      }
       const current = Number(el.dataset.val || 0);
       const state = { n: current };
       gsap.to(state, {

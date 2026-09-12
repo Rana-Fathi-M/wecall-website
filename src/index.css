@@ -2982,6 +2982,25 @@ textarea.qt-float-input {
   gap: 8px;
 }
 
+.qt-book-steps-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.qt-calendly {
+  min-height: 680px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #191d23;
+}
+
+html.light .qt-calendly {
+  background: #d9cfc3;
+}
+
+.qt-calendly iframe {
+  min-height: 680px;
+}
+
 .qt-book-steps li {
   min-width: 0;
 }
@@ -3365,6 +3384,15 @@ html.light .qt-input[type="date"] {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 4px;
     margin-top: 14px !important;
+  }
+
+  .qt-book-steps-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .qt-calendly,
+  .qt-calendly iframe {
+    min-height: 620px;
   }
 
   .qt-book-steps li button {

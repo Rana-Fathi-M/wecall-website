@@ -1,162 +1,15 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent, type RefObject } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { DayPicker } from "react-day-picker";
-import "react-day-picker/style.css";
 import { sendBookingEmail } from "../lib/sendBookingEmail";
+import { CALENDLY_URL } from "../lib/calendly";
+import { CalendlyEmbed } from "./CalendlyEmbed";
 import { ClaimSeatCta } from "./ClaimSeatCta";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const titleA = ["Secure", "Your", "Market", "Monopoly."];
 const titleB = ["Build", "Your", "Acquisition", "Desk."];
-
-const SESSION_ZONE = "America/New_York";
-const BOOKED_KEY = "wecall-booked-slots";
-const MIN_NOTICE_MS = 24 * 60 * 60 * 1000;
-
-const TIME_SLOTS = [
-  "10:00 AM",
-  "11:00 AM",
-  "12:00 PM",
-  "01:00 PM",
-  "02:00 PM",
-  "03:00 PM",
-  "04:00 PM",
-  "05:00 PM",
-  "06:00 PM",
-  "07:00 PM",
-  "08:00 PM",
-  "09:00 PM",
-  "10:00 PM",
-];
-
-function loadBookedSlots() {
-  try {
-    const raw = localStorage.getItem(BOOKED_KEY);
-    const parsed = raw ? (JSON.parse(raw) as string[]) : [];
-    return new Set(parsed);
-  } catch {
-    return new Set<string>();
-  }
-}
-
-function rememberBookedSlot(key: string) {
-  const next = loadBookedSlots();
-  next.add(key);
-  localStorage.setItem(BOOKED_KEY, JSON.stringify([...next]));
-}
-
-function slotKey(day: Date, slot: string) {
-  return `${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}|${slot}`;
-}
-
-const TIMEZONES = [
-  "America/New_York",
-  "America/Chicago",
-  "America/Denver",
-  "America/Los_Angeles",
-  "America/Phoenix",
-  "America/Toronto",
-  "Europe/London",
-  "Europe/Paris",
-  "Europe/Berlin",
-  "Africa/Cairo",
-  "Asia/Dubai",
-  "Asia/Riyadh",
-  "Asia/Karachi",
-  "Asia/Kolkata",
-  "Asia/Singapore",
-  "Australia/Sydney",
-];
-
-function detectedTimezone() {
-  try {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York";
-  } catch {
-    return "America/New_York";
-  }
-}
-
-function timezoneLabel(zone: string) {
-  try {
-    const now = new Date();
-    const offset =
-      new Intl.DateTimeFormat("en-US", {
-        timeZone: zone,
-        timeZoneName: "shortOffset",
-      })
-        .formatToParts(now)
-        .find((part) => part.type === "timeZoneName")?.value ?? "";
-    const city = zone.split("/").pop()?.replace(/_/g, " ") ?? zone;
-    return `${city} · ${offset}`;
-  } catch {
-    return zone;
-  }
-}
-
-function formatDay(date: Date) {
-  return date.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  });
-}
-
-const OWNER_TIMEZONE = "Africa/Cairo";
-
-function parseSlot(slot: string) {
-  const match = slot.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-  if (!match) return { hour: 9, minute: 0 };
-  let hour = Number(match[1]);
-  const minute = Number(match[2]);
-  const mer = match[3].toUpperCase();
-  if (mer === "AM" && hour === 12) hour = 0;
-  if (mer === "PM" && hour !== 12) hour += 12;
-  return { hour, minute };
-}
-
-function zoneOffsetMs(utcMs: number, timeZone: string) {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hourCycle: "h23",
-  }).formatToParts(new Date(utcMs));
-  const get = (type: Intl.DateTimeFormatPartTypes) =>
-    Number(parts.find((part) => part.type === type)?.value ?? 0);
-  const asUtc = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second"));
-  return asUtc - utcMs;
-}
-
-function wallTimeToDate(day: Date, slot: string, timeZone: string) {
-  const { hour, minute } = parseSlot(slot);
-  const utcGuess = Date.UTC(day.getFullYear(), day.getMonth(), day.getDate(), hour, minute);
-  const instant = utcGuess - zoneOffsetMs(utcGuess, timeZone);
-  return new Date(utcGuess - zoneOffsetMs(instant, timeZone));
-}
-
-function formatInZone(date: Date, timeZone: string) {
-  return {
-    date: date.toLocaleDateString("en-US", {
-      timeZone,
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-    }),
-    time: date.toLocaleTimeString("en-US", {
-      timeZone,
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    }),
-    zone: timezoneLabel(timeZone),
-  };
-}
 
 export function Quote() {
   const root = useRef<HTMLElement>(null);
@@ -293,8 +146,8 @@ export function Quote() {
             </span>
           </h2>
           <p className="qt-lede relative mx-auto mt-4 max-w-2xl font-manrope text-[16px] leading-relaxed font-medium text-[color:var(--qt-muted)] md:mt-6 md:text-[20px]">
-            Dial in the desk, lock a boardroom day, confirm your timezone and time, then send the
-            brief. We review every application within 24 hours.
+            Dial in the desk, send the brief, then lock a live Calendly hour. Booked times stay
+            taken. Canceled meetings open again. We review every application within 24 hours.
           </p>
         </header>
 
@@ -449,6 +302,14 @@ export function Quote() {
   );
 }
 
+type Brief = {
+  name: string;
+  email: string;
+  phone: string;
+  market: string;
+  bottleneck: string;
+};
+
 function BoardroomBooking({
   callers,
   leadManager,
@@ -464,91 +325,54 @@ function BoardroomBooking({
   price: number;
   includeData: boolean;
 }) {
-  const today = useMemo(() => {
-    const d = new Date(Date.now() + MIN_NOTICE_MS);
-    d.setHours(0, 0, 0, 0);
-    return d;
-  }, []);
-  const [booked, setBooked] = useState(() => loadBookedSlots());
-
-  const zones = useMemo(() => {
-    const local = detectedTimezone();
-    return [local, ...TIMEZONES.filter((z) => z !== local)];
-  }, []);
-
-  const [day, setDay] = useState<Date | undefined>();
-  const [timezone, setTimezone] = useState(SESSION_ZONE);
-  const [time, setTime] = useState<string | null>(null);
   const [view, setView] = useState(1);
-  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [brief, setBrief] = useState<Brief | null>(null);
+  const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
   const [error, setError] = useState("");
-
-  const conversion = useMemo(() => {
-    if (!day || !timezone || !time) return null;
-    const instant = wallTimeToDate(day, time, SESSION_ZONE);
-    return {
-      guest: formatInZone(instant, timezone),
-      owner: formatInZone(instant, OWNER_TIMEZONE),
-    };
-  }, [day, timezone, time]);
-
-  const unlocked = !day ? 1 : !timezone ? 2 : !time ? 3 : 4;
-  const step = view;
+  const locked = useRef(false);
 
   const goTo = (n: number) => {
-    if (n >= 1 && n <= unlocked) setView(n);
+    if (n === 1 || (n === 2 && brief)) setView(n);
   };
 
-  const onPickDay = (next?: Date) => {
-    setDay(next);
-    setTimezone((zone) => zone || SESSION_ZONE);
-    setTime(null);
-    setStatus("idle");
-    setError("");
-    if (next) setView(2);
-  };
-
-  const onPickZone = (zone: string) => {
-    setTimezone(zone);
-    setTime(null);
-    setStatus("idle");
-    if (zone) setView(3);
-  };
-
-  const submit = async (e: FormEvent<HTMLFormElement>) => {
+  const continueToCalendar = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!day || !timezone || !time) return;
-
     const form = new FormData(e.currentTarget);
-    const name = String(form.get("name") || "");
-    const email = String(form.get("email") || "");
-    const phone = String(form.get("phone") || "");
-    const market = String(form.get("market") || "");
-    const bottleneck = String(form.get("bottleneck") || "");
+    const next: Brief = {
+      name: String(form.get("name") || ""),
+      email: String(form.get("email") || ""),
+      phone: String(form.get("phone") || ""),
+      market: String(form.get("market") || ""),
+      bottleneck: String(form.get("bottleneck") || ""),
+    };
 
-    if (!isName(name) || !isEmail(email) || !isPhone(phone)) {
-      setError("Name, email, and phone are required to lock the session.");
+    if (!isName(next.name) || !isEmail(next.email) || !isPhone(next.phone)) {
+      setError("Name, email, and phone are required before a time can lock.");
       return;
     }
 
-    setStatus("sending");
     setError("");
+    setBrief(next);
+    setView(2);
+  };
 
+  const onScheduled = useCallback(async () => {
+    if (!brief || locked.current) return;
+    locked.current = true;
+    setStatus("sending");
     try {
       await sendBookingEmail({
-        name,
-        email,
-        phone,
-        startDate: formatDay(day),
-        market,
-        bottleneck,
-        meetingDate: formatDay(day),
-        meetingTime: time,
-        timezone: timezoneLabel(timezone),
-        ownerTimezone: timezoneLabel(OWNER_TIMEZONE),
-        ownerTime: conversion
-          ? `${conversion.owner.date} at ${conversion.owner.time}`
-          : "",
+        name: brief.name,
+        email: brief.email,
+        phone: brief.phone,
+        startDate: "Locked in Calendly",
+        market: brief.market,
+        bottleneck: brief.bottleneck,
+        meetingDate: "Confirmed in Calendly",
+        meetingTime: "See Calendly confirmation email",
+        timezone: "Invitee timezone in Calendly",
+        ownerTimezone: "Africa/Cairo",
+        ownerTime: "Shown on the admin Calendly calendar",
         callers,
         leadManager,
         closer: acq,
@@ -556,18 +380,15 @@ function BoardroomBooking({
         price,
         dataIncluded: includeData,
       });
-      rememberBookedSlot(slotKey(day, time));
-      setBooked(loadBookedSlots());
-      setStatus("sent");
-    } catch (err) {
-      setStatus("error");
-      setError(err instanceof Error ? err.message : "Could not send the booking. Try again.");
+    } catch {
+      /* Slot is already locked in Calendly — still confirm on-site. */
     }
-  };
+    setStatus("sent");
+  }, [acq, brief, callers, includeData, leadManager, price, sms]);
 
   return (
-    <div id="boardroom" className="qt-book qt-ticket qt-frame relative mt-4 overflow-hidden p-4 md:mt-8 md:p-10 lg:p-12">
-      <span className="qt-step-mark">0{step}</span>
+    <div id="boardroom" className="qt-book qt-ticket qt-frame relative mt-4 overflow-x-clip p-4 md:mt-8 md:p-10 lg:p-12">
+      <span className="qt-step-mark">0{view}</span>
       <p className="relative mb-2 flex items-center gap-2 font-manrope text-[11px] font-bold tracking-[0.22em] text-gold uppercase">
         <span className="seat-pulse inline-block h-2 w-2 rounded-full bg-gold" />
         2 of 10 seats left — reviewed in 24 hours
@@ -577,23 +398,21 @@ function BoardroomBooking({
       </h3>
       <span className="relative mt-4 block h-px w-14 bg-gold/50" />
       <p className="relative mt-4 max-w-2xl font-manrope text-[16px] leading-relaxed font-medium text-[color:var(--qt-muted)] md:text-[19px]">
-        Weekdays only, U.S. Eastern Time, 10 AM–10 PM. Book at least 24 hours ahead. One-hour slots,
-        no double booking. Name, email, and phone lock the session — the rest is optional.
+        The admin sets open hours in Calendly. When you take a slot it locks for everyone. If the
+        meeting is canceled, that hour shows again on this page.
       </p>
 
-      <ol className="qt-book-steps relative mt-8">
+      <ol className="qt-book-steps qt-book-steps-2 relative mt-8">
         {[
-          ["01", "Day"],
-          ["02", "Timezone"],
-          ["03", "Time"],
-          ["04", "Details"],
+          ["01", "Details"],
+          ["02", "Schedule"],
         ].map(([n, label], i) => {
           const index = i + 1;
           const current = view === index;
-          const done = unlocked > index || (unlocked === 4 && index === 4 && !!time);
+          const done = index === 1 ? !!brief : status === "sent";
           return (
             <li key={label} className={`${current ? "is-active is-current" : ""} ${done ? "is-done" : ""}`}>
-              <button type="button" disabled={index > unlocked} onClick={() => goTo(index)}>
+              <button type="button" disabled={index === 2 && !brief} onClick={() => goTo(index)}>
                 <span>{done && !current ? "✓" : n}</span>
                 {label}
               </button>
@@ -605,123 +424,25 @@ function BoardroomBooking({
       {status === "sent" ? (
         <div className="lock-burst relative mt-10 rounded-2xl border border-gold/40 bg-gold/10 px-6 py-16 text-center">
           <p className="font-mariyam text-[56px] leading-none text-gold md:text-[80px]">locked</p>
-          <p className="mt-4 font-nohemi text-[28px] font-semibold md:text-[40px]">{day ? formatDay(day) : ""}</p>
-          <p className="mt-2 font-manrope text-[18px] font-medium text-gold">
-            {conversion ? `${conversion.guest.time} · ${conversion.guest.zone}` : time}
+          <p className="mt-4 font-nohemi text-[28px] font-semibold md:text-[40px]">Time reserved</p>
+          <p className="mt-2 font-manrope text-[16px] font-medium text-gold">
+            Calendly emailed the invite. That hour is blocked until it is canceled.
           </p>
-          {conversion ? (
-            <p className="mt-2 font-manrope text-[15px] text-[color:var(--qt-muted)]">
-              WeCall time: {conversion.owner.time} · {conversion.owner.zone}
-            </p>
-          ) : null}
           <p className="mx-auto mt-5 max-w-md font-manrope text-[13px] text-[color:var(--qt-muted)]">
-            Your boardroom brief is in the inbox. We review applications within 24 hours.
+            Your boardroom brief is in the inbox. Cancel in Calendly and the slot reopens here for
+            the next investor.
           </p>
         </div>
       ) : (
         <div className="qt-wizard relative mt-8">
           {view === 1 ? (
-            <div className="qt-panel qt-wizard-pane mx-auto max-w-xl rounded-2xl p-4 md:p-8">
-              <p className="mb-2 font-manrope text-[13px] font-bold tracking-[0.22em] text-gold uppercase">
-                Step 01 · Select a weekday
+            <form className="qt-form qt-wizard-pane mx-auto max-w-3xl space-y-4 md:space-y-7" onSubmit={continueToCalendar}>
+              <p className="font-manrope text-[13px] font-bold tracking-[0.22em] text-gold uppercase">
+                Step 01 · Send the brief
               </p>
-              <p className="mb-5 font-manrope text-[15px] text-[color:var(--qt-muted)]">
-                Weekdays only. Earliest bookable day is 24 hours from now.
+              <p className="font-manrope text-[15px] text-[color:var(--qt-muted)]">
+                Name, email, and phone first. Then Calendly shows only hours the admin left open.
               </p>
-              <DayPicker
-                mode="single"
-                selected={day}
-                onSelect={onPickDay}
-                disabled={[{ before: today }, { dayOfWeek: [0, 6] }]}
-                startMonth={today}
-                className="qt-picker"
-                animate
-              />
-            </div>
-          ) : null}
-
-          {view === 2 ? (
-            <div className="qt-panel qt-wizard-pane mx-auto max-w-xl rounded-2xl p-4 md:p-8">
-              <p className="mb-2 font-manrope text-[13px] font-bold tracking-[0.22em] text-gold uppercase">
-                Step 02 · Confirm timezone
-              </p>
-              <p className="mb-5 font-manrope text-[15px] text-[color:var(--qt-muted)]">
-                Sessions are held in U.S. Eastern Time (10 AM–10 PM). Confirm how you want that shown.
-              </p>
-              <label className="block">
-                <span className="sr-only">Timezone</span>
-                <select
-                  className="qt-input qt-zone"
-                  value={timezone}
-                  onChange={(e) => onPickZone(e.target.value)}
-                >
-                  <option value="">Select your timezone</option>
-                  {zones.map((zone) => (
-                    <option key={zone} value={zone}>
-                      {timezoneLabel(zone)}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <div className="qt-wizard-nav">
-                <button type="button" className="qt-back" onClick={() => goTo(1)}>
-                  Back
-                </button>
-              </div>
-            </div>
-          ) : null}
-
-          {view === 3 ? (
-            <div className="qt-panel qt-wizard-pane mx-auto max-w-2xl rounded-2xl p-4 md:p-8">
-              <p className="mb-2 font-manrope text-[13px] font-bold tracking-[0.22em] text-gold uppercase">
-                Step 03 · Lock a time
-              </p>
-              <p className="mb-5 font-manrope text-[15px] text-[color:var(--qt-muted)]">
-                {day ? formatDay(day) : ""} · Eastern Time · 1 hour between sessions
-              </p>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {TIME_SLOTS.map((slot) => {
-                  const instant = day ? wallTimeToDate(day, slot, SESSION_ZONE) : null;
-                  const tooSoon = instant ? instant.getTime() < Date.now() + MIN_NOTICE_MS : true;
-                  const taken = day ? booked.has(slotKey(day, slot)) : false;
-                  const blocked = tooSoon || taken;
-                  return (
-                    <button
-                      key={slot}
-                      type="button"
-                      disabled={blocked}
-                      onClick={() => {
-                        if (blocked) return;
-                        setTime(slot);
-                        setStatus("idle");
-                        setView(4);
-                      }}
-                      className={`qt-slot min-h-[50px] rounded-xl px-3 py-3 text-center font-manrope text-[15px] font-medium ${
-                        time === slot ? "bg-gold text-ink" : "border border-[color:var(--qt-line)]"
-                      } disabled:cursor-not-allowed disabled:opacity-35`}
-                    >
-                      {slot} ET
-                      {taken ? " · booked" : ""}
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="qt-wizard-nav">
-                <button type="button" className="qt-back" onClick={() => goTo(2)}>
-                  Back
-                </button>
-              </div>
-            </div>
-          ) : null}
-
-          {view === 4 && day && timezone && time ? (
-            <form className="qt-form qt-wizard-pane mx-auto max-w-3xl space-y-4 md:space-y-7" onSubmit={submit}>
-              <div>
-                <p className="font-manrope text-[13px] font-bold tracking-[0.22em] text-gold uppercase">
-                  Step 04 · Send the brief
-                </p>
-                <TimeConversionCard guest={conversion!.guest} owner={conversion!.owner} />
-              </div>
 
               <div className="qt-form-fields grid grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-8">
                 <Field label="Name" name="name" autoComplete="name" validate={isName} />
@@ -732,60 +453,50 @@ function BoardroomBooking({
               <Field label="Target Market & Buy-Box (optional)" name="market" as="textarea" required={false} validate={() => true} />
               <Field label="Core Operational Bottleneck (optional)" name="bottleneck" as="textarea" required={false} validate={() => true} />
 
-              {error ? (
-                <p className="font-manrope text-[13px] text-red-400">{error}</p>
-              ) : null}
-
-              <div className="qt-wizard-nav">
-                <button type="button" className="qt-back" onClick={() => goTo(3)}>
-                  Back
-                </button>
-              </div>
+              {error ? <p className="font-manrope text-[13px] text-red-400">{error}</p> : null}
 
               <div className="qt-submit-bar">
-                <ClaimSeatCta
-                  type="submit"
-                  wide
-                  disabled={status === "sending"}
-                  className="disabled:opacity-40"
-                  busyLabel={status === "sending" ? "Sending brief…" : undefined}
-                />
+                <ClaimSeatCta type="submit" wide busyLabel="Continue to live times" />
               </div>
             </form>
           ) : null}
+
+          {view === 2 && brief ? (
+            <div className="qt-wizard-pane mx-auto max-w-3xl">
+              <p className="font-manrope text-[13px] font-bold tracking-[0.22em] text-gold uppercase">
+                Step 02 · Lock a live hour
+              </p>
+              <p className="mt-2 mb-5 font-manrope text-[15px] text-[color:var(--qt-muted)]">
+                These times come from the admin calendar. Taken hours stay hidden. Canceled hours
+                return automatically.
+              </p>
+
+              {CALENDLY_URL ? (
+                <CalendlyEmbed
+                  url={CALENDLY_URL}
+                  name={brief.name}
+                  email={brief.email}
+                  onScheduled={onScheduled}
+                />
+              ) : (
+                <div className="rounded-2xl border border-gold/35 bg-gold/10 px-5 py-10 text-center">
+                  <p className="font-nohemi text-[22px] font-semibold">Calendar not connected yet</p>
+                  <p className="mx-auto mt-3 max-w-md font-manrope text-[14px] text-[color:var(--qt-muted)]">
+                    Add the admin Calendly event link as <span className="text-gold">VITE_CALENDLY_URL</span>{" "}
+                    so live availability can lock and reopen on this page.
+                  </p>
+                </div>
+              )}
+
+              <div className="qt-wizard-nav">
+                <button type="button" className="qt-back" onClick={() => goTo(1)}>
+                  Back
+                </button>
+              </div>
+            </div>
+          ) : null}
         </div>
       )}
-    </div>
-  );
-}
-
-function TimeConversionCard({
-  guest,
-  owner,
-}: {
-  guest: { date: string; time: string; zone: string };
-  owner: { date: string; time: string; zone: string };
-}) {
-  return (
-    <div className="mt-4 grid gap-2 rounded-2xl border border-gold/35 bg-gold/10 p-4">
-      <div>
-        <p className="font-manrope text-[11px] font-bold tracking-[0.18em] text-gold uppercase">
-          Your timezone
-        </p>
-        <p className="mt-1 font-manrope text-[16px] font-semibold leading-snug">
-          {guest.time} · {guest.zone}
-        </p>
-        <p className="mt-0.5 font-manrope text-[13px] text-[color:var(--qt-muted)]">{guest.date}</p>
-      </div>
-      <div className="border-t border-gold/20 pt-3">
-        <p className="font-manrope text-[11px] font-bold tracking-[0.18em] text-gold uppercase">
-          WeCall time · Cairo
-        </p>
-        <p className="mt-1 font-manrope text-[16px] font-semibold leading-snug">
-          {owner.time} · {owner.zone}
-        </p>
-        <p className="mt-0.5 font-manrope text-[13px] text-[color:var(--qt-muted)]">{owner.date}</p>
-      </div>
     </div>
   );
 }

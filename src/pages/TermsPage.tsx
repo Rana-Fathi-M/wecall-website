@@ -30,7 +30,7 @@ const sections = [
     title: "Applications and boardroom sessions",
     body: [
       "A calendar booking is a request for a private strategy / integration mapping session. It is not a signed service contract and does not reserve a seat until we confirm in writing.",
-      "Seats are limited. We may accept, waitlist, or decline any application. Times you pick are shown in your timezone and converted to WeCall’s operating timezone (Africa/Cairo) for our team.",
+      "Live times come from our Calendly calendar. A booked hour is locked for other visitors. If you or WeCall cancel that meeting in Calendly, the hour becomes available on the site again.",
       "You agree that the information you submit (name, contact details, market, buy-box, bottleneck, and desk configuration) is accurate and may be emailed to our intake inbox so we can prepare for the call.",
     ],
   },

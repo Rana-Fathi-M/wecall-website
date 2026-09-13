@@ -329,6 +329,7 @@ function BoardroomBooking({
   const [brief, setBrief] = useState<Brief | null>(null);
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
   const [error, setError] = useState("");
+  const [briefMailFailed, setBriefMailFailed] = useState(false);
   const locked = useRef(false);
 
   const goTo = (n: number) => {
@@ -360,6 +361,7 @@ function BoardroomBooking({
     if (!brief || locked.current) return;
     locked.current = true;
     setStatus("sending");
+    setBriefMailFailed(false);
     try {
       await sendBookingEmail({
         name: brief.name,
@@ -381,7 +383,7 @@ function BoardroomBooking({
         dataIncluded: includeData,
       });
     } catch {
-      /* Slot is already locked in Calendly — still confirm on-site. */
+      setBriefMailFailed(true);
     }
     setStatus("sent");
   }, [acq, brief, callers, includeData, leadManager, price, sms]);
@@ -429,8 +431,9 @@ function BoardroomBooking({
             Calendly emailed the invite. That hour is blocked until it is canceled.
           </p>
           <p className="mx-auto mt-5 max-w-md font-manrope text-[13px] text-[color:var(--qt-muted)]">
-            Your boardroom brief is in the inbox. Cancel in Calendly and the slot reopens here for
-            the next investor.
+            {briefMailFailed
+              ? "The calendar is locked. The WeCall confirmation email could not send — check spam for the Calendly invite, or email admin@wecall247.com."
+              : "We sent a confirmation to you and the booking brief to admin@wecall247.com. Check spam if nothing landed in a minute."}
           </p>
         </div>
       ) : (

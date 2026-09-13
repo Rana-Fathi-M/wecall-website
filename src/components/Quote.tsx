@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent, type RefObject } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { describeEmailError, sendBookingEmail, type BookingPayload } from "../lib/sendBookingEmail";
 import { CALENDLY_URL } from "../lib/calendly";
-import { formatCalendlyTimes, type CalendlySchedule } from "../lib/calendlyEvent";
 import { CalendlyEmbed } from "./CalendlyEmbed";
 import { ClaimSeatCta } from "./ClaimSeatCta";
 
@@ -147,8 +145,8 @@ export function Quote() {
             </span>
           </h2>
           <p className="qt-lede relative mx-auto mt-4 max-w-2xl font-manrope text-[16px] leading-relaxed font-medium text-[color:var(--qt-muted)] md:mt-6 md:text-[20px]">
-            Dial in the desk, send the brief, then lock a live Calendly hour. Booked times stay
-            taken. Canceled meetings open again. We review every application within 24 hours.
+            Dial in the desk, then lock a live Calendly hour. Calendly emails you and WeCall with
+            the booked time. Canceled meetings open again. We review every application within 24 hours.
           </p>
         </header>
 
@@ -290,14 +288,7 @@ export function Quote() {
           </div>
         </div>
 
-        <BoardroomBooking
-          callers={callers}
-          leadManager={leadManager}
-          acq={acq}
-          sms={sms}
-          price={price}
-          includeData={includeData}
-        />
+        <BoardroomBooking />
       </div>
     </section>
   );
@@ -311,52 +302,12 @@ type Brief = {
   bottleneck: string;
 };
 
-function BoardroomBooking({
-  callers,
-  leadManager,
-  acq,
-  sms,
-  price,
-  includeData,
-}: {
-  callers: number;
-  leadManager: boolean;
-  acq: boolean;
-  sms: "yes" | "discuss";
-  price: number;
-  includeData: boolean;
-}) {
+function BoardroomBooking() {
   const [view, setView] = useState(1);
   const [brief, setBrief] = useState<Brief | null>(null);
-  const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
+  const [status, setStatus] = useState<"idle" | "sent">("idle");
   const [error, setError] = useState("");
-  const [briefMailFailed, setBriefMailFailed] = useState(false);
   const locked = useRef(false);
-
-  const payloadFrom = (next: Brief, schedule: CalendlySchedule = {}): BookingPayload => {
-    const times = formatCalendlyTimes(schedule);
-    return {
-      name: next.name,
-      email: next.email,
-      phone: next.phone,
-      startDate: times.meetingDate,
-      market: next.market,
-      bottleneck: next.bottleneck,
-      meetingDate: times.meetingDate,
-      meetingTime: times.meetingTime,
-      timezone: times.timezone,
-      ownerTimezone: times.ownerTimezone,
-      ownerTime: times.ownerTime,
-      callers,
-      leadManager,
-      closer: acq,
-      sms: sms === "yes" ? "Inject into Build" : "Discuss on Consult",
-      price,
-      dataIncluded: includeData,
-      calendlyEvent: schedule.eventUri,
-      calendlyInvitee: schedule.inviteeUri,
-    };
-  };
 
   const goTo = (n: number) => {
     if (n === 1 || (n === 2 && brief)) setView(n);
@@ -379,25 +330,15 @@ function BoardroomBooking({
     }
 
     setError("");
-    setBriefMailFailed(false);
     setBrief(next);
     setView(2);
   };
 
-  const onScheduled = useCallback(async (schedule: CalendlySchedule) => {
-    if (!brief || locked.current) return;
+  const onScheduled = useCallback(() => {
+    if (locked.current) return;
     locked.current = true;
-    setStatus("sending");
-    try {
-      await sendBookingEmail(payloadFrom(brief, schedule));
-      setBriefMailFailed(false);
-      setError("");
-    } catch (err) {
-      setBriefMailFailed(true);
-      setError(describeEmailError(err));
-    }
     setStatus("sent");
-  }, [acq, brief, callers, includeData, leadManager, price, sms]);
+  }, []);
 
   return (
     <div id="boardroom" className="qt-book qt-ticket qt-frame relative mt-4 overflow-x-clip p-4 md:mt-8 md:p-10 lg:p-12">
@@ -439,12 +380,11 @@ function BoardroomBooking({
           <p className="font-mariyam text-[56px] leading-none text-gold md:text-[80px]">locked</p>
           <p className="mt-4 font-nohemi text-[28px] font-semibold md:text-[40px]">Time reserved</p>
           <p className="mt-2 font-manrope text-[16px] font-medium text-gold">
-            Calendly emailed the invite. That hour is blocked until it is canceled.
+            Calendly emailed you and WeCall with the booked hour.
           </p>
           <p className="mx-auto mt-5 max-w-md font-manrope text-[13px] text-[color:var(--qt-muted)]">
-            {briefMailFailed
-              ? "The calendar is locked. The WeCall confirmation email could not send — check spam for the Calendly invite, or email admin@wecall247.com."
-              : "We sent a confirmation to you and the booking brief to admin@wecall247.com. Check spam if nothing landed in a minute."}
+            Check inbox and spam for the Calendly confirmation. That hour stays blocked until it is
+            canceled.
           </p>
         </div>
       ) : (
@@ -455,7 +395,7 @@ function BoardroomBooking({
                 Step 01 · Your details
               </p>
               <p className="font-manrope text-[15px] text-[color:var(--qt-muted)]">
-                Name, email, and phone first. We do not email admin or you until a Calendly time is locked.
+                Name, email, and phone first. Calendly emails the locked time after you pick an hour.
               </p>
 
               <div className="qt-form-fields grid grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-8">
@@ -481,8 +421,8 @@ function BoardroomBooking({
                 Step 02 · Lock a live hour
               </p>
               <p className="mt-2 mb-5 font-manrope text-[15px] text-[color:var(--qt-muted)]">
-                No email is sent yet. Choose a time below. Only after that hour locks do we email
-                you and admin@wecall247.com with the booked time and brief.
+                Choose a time below. Calendly locks that hour and emails you and WeCall from your
+                Calendly template.
               </p>
 
               {CALENDLY_URL ? (

@@ -1,13 +1,13 @@
 import { useEffect, useRef } from "react";
 import { calendlyWidgetUrl } from "../lib/calendly";
-import { parseCalendlyPayload, type CalendlySchedule } from "../lib/calendlyEvent";
+import { calendlyEventName } from "../lib/calendlyEvent";
 import { useTheme } from "../context/ThemeContext";
 
 type Props = {
   url: string;
   name?: string;
   email?: string;
-  onScheduled: (schedule: CalendlySchedule) => void;
+  onScheduled: () => void;
 };
 
 declare global {
@@ -46,24 +46,10 @@ function loadScript() {
   });
 }
 
-function calendlyEventName(raw: unknown): string {
-  let data = raw;
-  if (typeof data === "string") {
-    try {
-      data = JSON.parse(data);
-    } catch {
-      return data.toLowerCase().includes("event_scheduled") ? "calendly.event_scheduled" : "";
-    }
-  }
-  if (!data || typeof data !== "object") return "";
-  const event = (data as { event?: unknown }).event;
-  return typeof event === "string" ? event : "";
-}
-
 export function CalendlyEmbed({ url, name, email, onScheduled }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const onScheduledRef = useRef(onScheduled);
-  const picked = useRef<CalendlySchedule>({});
+  const sent = useRef(false);
   const { theme } = useTheme();
   onScheduledRef.current = onScheduled;
 
@@ -72,7 +58,7 @@ export function CalendlyEmbed({ url, name, email, onScheduled }: Props) {
     if (!node) return;
     let gone = false;
     node.innerHTML = "";
-    picked.current = {};
+    sent.current = false;
 
     loadScript()
       .then(() => {
@@ -88,15 +74,12 @@ export function CalendlyEmbed({ url, name, email, onScheduled }: Props) {
     const onMessage = (event: MessageEvent) => {
       const origin = String(event.origin || "");
       if (origin && !origin.includes("calendly.com")) return;
-      const name = calendlyEventName(event.data);
-      const parsed = parseCalendlyPayload(event.data);
-      if (name.includes("date_and_time_selected") || name.includes("event_scheduled")) {
-        picked.current = { ...picked.current, ...parsed };
-      }
-      if (name.includes("event_scheduled")) {
-        onScheduledRef.current(picked.current);
-      }
+      if (calendlyEventName(event.data) !== "calendly.event_scheduled") return;
+      if (sent.current) return;
+      sent.current = true;
+      onScheduledRef.current();
     };
+
     window.addEventListener("message", onMessage);
 
     return () => {

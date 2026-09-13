@@ -31,7 +31,7 @@ const sections = [
     body: [
       "A calendar booking is a request for a private strategy / integration mapping session. It is not a signed service contract and does not reserve a seat until we confirm in writing.",
       "Live times come from our Google Calendar / Calendly integration. A booked hour is locked for other visitors. If you or WeCall cancel that meeting in the calendar system, the hour becomes available on the site again.",
-      "You agree that the information you submit (name, contact details, market, buy-box, bottleneck, and desk configuration) is accurate and may be transmitted via webhook to our intake inbox so we can prepare for the call.",
+      "You agree that the information you submit (name, contact details, market, buy-box, bottleneck, and desk configuration) is accurate. After you lock a Calendly hour, Calendly emails you and WeCall with the booked time.",
     ],
   },
   {

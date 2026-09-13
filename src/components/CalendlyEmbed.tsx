@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { calendlyWidgetUrl } from "../lib/calendly";
+import { calendlyWidgetUrl, type CalendlyPrefill } from "../lib/calendly";
 import { calendlyEventName } from "../lib/calendlyEvent";
 import { useTheme } from "../context/ThemeContext";
 
@@ -7,6 +7,7 @@ type Props = {
   url: string;
   name?: string;
   email?: string;
+  answers?: string[];
   onScheduled: () => void;
 };
 
@@ -16,7 +17,11 @@ declare global {
       initInlineWidget: (opts: {
         url: string;
         parentElement: HTMLElement;
-        prefill?: { name?: string; email?: string };
+        prefill?: {
+          name?: string;
+          email?: string;
+          customAnswers?: Record<string, string>;
+        };
       }) => void;
     };
   }
@@ -46,11 +51,19 @@ function loadScript() {
   });
 }
 
-export function CalendlyEmbed({ url, name, email, onScheduled }: Props) {
+function customAnswers(answers: string[] = []) {
+  return answers.reduce<Record<string, string>>((map, answer, index) => {
+    if (answer.trim()) map[`a${index + 1}`] = answer;
+    return map;
+  }, {});
+}
+
+export function CalendlyEmbed({ url, name, email, answers = [], onScheduled }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const onScheduledRef = useRef(onScheduled);
   const sent = useRef(false);
   const { theme } = useTheme();
+  const answersKey = answers.join("\u0000");
   onScheduledRef.current = onScheduled;
 
   useEffect(() => {
@@ -63,10 +76,15 @@ export function CalendlyEmbed({ url, name, email, onScheduled }: Props) {
     loadScript()
       .then(() => {
         if (gone || !host.current || !window.Calendly) return;
+        const prefill: CalendlyPrefill = { name, email, answers };
         window.Calendly.initInlineWidget({
-          url: calendlyWidgetUrl(url, { name, email }, theme),
+          url: calendlyWidgetUrl(url, prefill, theme),
           parentElement: host.current,
-          prefill: { name, email },
+          prefill: {
+            name,
+            email,
+            customAnswers: customAnswers(answers),
+          },
         });
       })
       .catch(() => undefined);
@@ -87,7 +105,7 @@ export function CalendlyEmbed({ url, name, email, onScheduled }: Props) {
       window.removeEventListener("message", onMessage);
       node.innerHTML = "";
     };
-  }, [url, name, email, theme]);
+  }, [url, name, email, answersKey, theme]);
 
   return <div ref={host} className="qt-calendly" />;
 }

@@ -288,7 +288,9 @@ export function Quote() {
           </div>
         </div>
 
-        <BoardroomBooking />
+        <BoardroomBooking
+          desk={`${callers} agent${callers === 1 ? "" : "s"} · LM ${leadManager ? "yes" : "no"} · closer ${acq ? "yes" : "no"} · data ${includeData ? "included" : "excluded"} · $${price.toLocaleString()}/mo · SMS ${sms === "yes" ? "inject" : "discuss"}`}
+        />
       </div>
     </section>
   );
@@ -302,7 +304,7 @@ type Brief = {
   bottleneck: string;
 };
 
-function BoardroomBooking() {
+function BoardroomBooking({ desk }: { desk: string }) {
   const [view, setView] = useState(1);
   const [brief, setBrief] = useState<Brief | null>(null);
   const [status, setStatus] = useState<"idle" | "sent">("idle");
@@ -430,6 +432,12 @@ function BoardroomBooking() {
                   url={CALENDLY_URL}
                   name={brief.name}
                   email={brief.email}
+                  answers={[
+                    brief.phone,
+                    brief.market.trim() || "Not specified",
+                    brief.bottleneck.trim() || "Not specified",
+                    desk,
+                  ]}
                   onScheduled={onScheduled}
                 />
               ) : (

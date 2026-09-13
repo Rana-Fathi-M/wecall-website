@@ -15,9 +15,15 @@ const THEMES = {
   },
 } as const;
 
+export type CalendlyPrefill = {
+  name?: string;
+  email?: string;
+  answers?: string[];
+};
+
 export function calendlyWidgetUrl(
   base: string,
-  prefill?: { name?: string; email?: string },
+  prefill?: CalendlyPrefill,
   theme: "dark" | "light" = "dark",
 ) {
   const url = new URL(base);
@@ -28,5 +34,8 @@ export function calendlyWidgetUrl(
   url.searchParams.set("primary_color", colors.primary_color);
   if (prefill?.name) url.searchParams.set("name", prefill.name);
   if (prefill?.email) url.searchParams.set("email", prefill.email);
+  prefill?.answers?.forEach((answer, index) => {
+    if (answer.trim()) url.searchParams.set(`a${index + 1}`, answer);
+  });
   return url.toString();
 }

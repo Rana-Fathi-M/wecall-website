@@ -455,7 +455,7 @@ function BoardroomBooking({
                 Step 01 · Your details
               </p>
               <p className="font-manrope text-[15px] text-[color:var(--qt-muted)]">
-                Name, email, and phone first. Nothing is emailed until you lock a Calendly hour.
+                Name, email, and phone first. We do not email admin or you until a Calendly time is locked.
               </p>
 
               <div className="qt-form-fields grid grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-8">
@@ -481,9 +481,8 @@ function BoardroomBooking({
                 Step 02 · Lock a live hour
               </p>
               <p className="mt-2 mb-5 font-manrope text-[15px] text-[color:var(--qt-muted)]">
-                These times come from the admin calendar. Taken hours stay hidden. Canceled hours
-                return automatically. WeCall emails you and admin@wecall247.com only after this
-                hour locks.
+                No email is sent yet. Choose a time below. Only after that hour locks do we email
+                you and admin@wecall247.com with the booked time and brief.
               </p>
 
               {CALENDLY_URL ? (

@@ -2,9 +2,14 @@ import emailjs from "@emailjs/browser";
 
 export const BOOKING_INBOX = "admin@wecall247.com";
 
-const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || "service_fc370iu";
-const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || "template_8m45r9j";
-const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || "7Gbb_t6HWGYegJa4G";
+function envOr(name: keyof ImportMetaEnv, fallback: string) {
+  const value = String(import.meta.env[name] ?? "").trim();
+  return !value || value === "undefined" ? fallback : value;
+}
+
+const SERVICE_ID = envOr("VITE_EMAILJS_SERVICE_ID", "service_fc370iu");
+const TEMPLATE_ID = envOr("VITE_EMAILJS_TEMPLATE_ID", "template_8m45r9j");
+const PUBLIC_KEY = envOr("VITE_EMAILJS_PUBLIC_KEY", "7Gbb_t6HWGYegJa4G");
 
 export type BookingPayload = {
   name: string;
@@ -65,17 +70,43 @@ function briefParams(data: BookingPayload) {
   };
 }
 
-function sendOne(data: BookingPayload, copy: MailCopy) {
+export function describeEmailError(err: unknown): string {
+  if (err && typeof err === "object") {
+    const rec = err as { text?: unknown; status?: unknown; message?: unknown };
+    const text = typeof rec.text === "string" ? rec.text.trim() : "";
+    const status = rec.status != null ? String(rec.status) : "";
+    if (text && status) return `${status}: ${text}`;
+    if (text) return text;
+    if (typeof rec.message === "string" && rec.message.trim()) return rec.message;
+  }
+  return "EmailJS rejected the send.";
+}
+
+function sendOne(data: BookingPayload, copy: MailCopy, serviceId = SERVICE_ID) {
   ensureClient();
-  return emailjs.send(SERVICE_ID, TEMPLATE_ID, {
-    ...briefParams(data),
-    to_email: copy.toEmail,
-    to_name: copy.toName,
-    title: copy.title,
-    headline: copy.headline,
-    intro: copy.intro,
-    reply_to: copy.replyTo,
-  });
+  return emailjs.send(
+    serviceId,
+    TEMPLATE_ID,
+    {
+      ...briefParams(data),
+      to_email: copy.toEmail,
+      to_name: copy.toName,
+      title: copy.title,
+      headline: copy.headline,
+      intro: copy.intro,
+      reply_to: copy.replyTo,
+    },
+    { publicKey: PUBLIC_KEY },
+  );
+}
+
+async function sendWithFallback(data: BookingPayload, copy: MailCopy) {
+  try {
+    return await sendOne(data, copy);
+  } catch (first) {
+    if (SERVICE_ID === "default_service") throw first;
+    return sendOne(data, copy, "default_service");
+  }
 }
 
 function pause(ms: number) {
@@ -83,7 +114,7 @@ function pause(ms: number) {
 }
 
 export function sendAdminBrief(data: BookingPayload) {
-  return sendOne(data, {
+  return sendWithFallback(data, {
     toEmail: BOOKING_INBOX,
     toName: "WeCall Admin",
     title: "New boardroom brief",
@@ -95,7 +126,7 @@ export function sendAdminBrief(data: BookingPayload) {
 
 export function sendGuestConfirmation(data: BookingPayload) {
   const guest = data.email.trim();
-  return sendOne(data, {
+  return sendWithFallback(data, {
     toEmail: guest,
     toName: data.name,
     title: "Your boardroom session is scheduled",

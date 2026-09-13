@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent, type RefObject } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { sendAdminBrief, sendBookingEmail, type BookingPayload } from "../lib/sendBookingEmail";
+import { describeEmailError, sendAdminBrief, sendBookingEmail, type BookingPayload } from "../lib/sendBookingEmail";
 import { CALENDLY_URL } from "../lib/calendly";
 import { CalendlyEmbed } from "./CalendlyEmbed";
 import { ClaimSeatCta } from "./ClaimSeatCta";
@@ -376,14 +376,15 @@ function BoardroomBooking({
     setError("");
     setSendingBrief(true);
     setBriefMailFailed(false);
-    try {
-      await sendAdminBrief(payloadFrom(next, "picking"));
-    } catch {
-      setBriefMailFailed(true);
-    }
-    setSendingBrief(false);
     setBrief(next);
     setView(2);
+    try {
+      await sendAdminBrief(payloadFrom(next, "picking"));
+    } catch (err) {
+      setBriefMailFailed(true);
+      setError(describeEmailError(err));
+    }
+    setSendingBrief(false);
   };
 
   const onScheduled = useCallback(async () => {
@@ -393,8 +394,10 @@ function BoardroomBooking({
     try {
       await sendBookingEmail(payloadFrom(brief, "locked"));
       setBriefMailFailed(false);
-    } catch {
+      setError("");
+    } catch (err) {
       setBriefMailFailed(true);
+      setError(describeEmailError(err));
     }
     setStatus("sent");
   }, [acq, brief, callers, includeData, leadManager, price, sms]);
@@ -489,10 +492,15 @@ function BoardroomBooking({
                 These times come from the admin calendar. Taken hours stay hidden. Canceled hours
                 return automatically.
               </p>
-              {briefMailFailed ? (
+              {sendingBrief ? (
+                <p className="mb-4 font-manrope text-[13px] text-gold">
+                  Sending the brief to admin@wecall247.com. Pick an hour below — you do not need to
+                  wait for that email.
+                </p>
+              ) : briefMailFailed ? (
                 <p className="mb-4 font-manrope text-[13px] text-red-400">
-                  The brief email did not send. You can still lock a time. Email admin@wecall247.com
-                  if you do not get a confirmation.
+                  The brief email did not send, but you can still lock a time.
+                  {error ? ` ${error}` : ""}
                 </p>
               ) : (
                 <p className="mb-4 font-manrope text-[13px] text-gold">

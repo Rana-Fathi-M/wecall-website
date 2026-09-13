@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent, type RefObject } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { sendBookingEmail } from "../lib/sendBookingEmail";
+import { sendAdminBrief, sendBookingEmail, type BookingPayload } from "../lib/sendBookingEmail";
 import { CALENDLY_URL } from "../lib/calendly";
 import { CalendlyEmbed } from "./CalendlyEmbed";
 import { ClaimSeatCta } from "./ClaimSeatCta";
@@ -330,13 +330,34 @@ function BoardroomBooking({
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
   const [error, setError] = useState("");
   const [briefMailFailed, setBriefMailFailed] = useState(false);
+  const [sendingBrief, setSendingBrief] = useState(false);
   const locked = useRef(false);
+
+  const payloadFrom = (next: Brief, meeting: "picking" | "locked"): BookingPayload => ({
+    name: next.name,
+    email: next.email,
+    phone: next.phone,
+    startDate: meeting === "locked" ? "Locked in Calendly" : "Selecting a Calendly hour",
+    market: next.market,
+    bottleneck: next.bottleneck,
+    meetingDate: meeting === "locked" ? "Confirmed in Calendly" : "Time not locked yet",
+    meetingTime: meeting === "locked" ? "See Calendly confirmation email" : "Investor is picking a live hour",
+    timezone: meeting === "locked" ? "Invitee timezone in Calendly" : "Pending Calendly",
+    ownerTimezone: "Africa/Cairo",
+    ownerTime: meeting === "locked" ? "Shown on the admin Calendly calendar" : "Pending Calendly",
+    callers,
+    leadManager,
+    closer: acq,
+    sms: sms === "yes" ? "Inject into Build" : "Discuss on Consult",
+    price,
+    dataIncluded: includeData,
+  });
 
   const goTo = (n: number) => {
     if (n === 1 || (n === 2 && brief)) setView(n);
   };
 
-  const continueToCalendar = (e: FormEvent<HTMLFormElement>) => {
+  const continueToCalendar = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     const next: Brief = {
@@ -353,6 +374,14 @@ function BoardroomBooking({
     }
 
     setError("");
+    setSendingBrief(true);
+    setBriefMailFailed(false);
+    try {
+      await sendAdminBrief(payloadFrom(next, "picking"));
+    } catch {
+      setBriefMailFailed(true);
+    }
+    setSendingBrief(false);
     setBrief(next);
     setView(2);
   };
@@ -361,27 +390,9 @@ function BoardroomBooking({
     if (!brief || locked.current) return;
     locked.current = true;
     setStatus("sending");
-    setBriefMailFailed(false);
     try {
-      await sendBookingEmail({
-        name: brief.name,
-        email: brief.email,
-        phone: brief.phone,
-        startDate: "Locked in Calendly",
-        market: brief.market,
-        bottleneck: brief.bottleneck,
-        meetingDate: "Confirmed in Calendly",
-        meetingTime: "See Calendly confirmation email",
-        timezone: "Invitee timezone in Calendly",
-        ownerTimezone: "Africa/Cairo",
-        ownerTime: "Shown on the admin Calendly calendar",
-        callers,
-        leadManager,
-        closer: acq,
-        sms: sms === "yes" ? "Inject into Build" : "Discuss on Consult",
-        price,
-        dataIncluded: includeData,
-      });
+      await sendBookingEmail(payloadFrom(brief, "locked"));
+      setBriefMailFailed(false);
     } catch {
       setBriefMailFailed(true);
     }
@@ -459,7 +470,12 @@ function BoardroomBooking({
               {error ? <p className="font-manrope text-[13px] text-red-400">{error}</p> : null}
 
               <div className="qt-submit-bar">
-                <ClaimSeatCta type="submit" wide busyLabel="Continue to live times" />
+                <ClaimSeatCta
+                  type="submit"
+                  wide
+                  disabled={sendingBrief}
+                  busyLabel={sendingBrief ? "Sending brief to WeCall…" : "Continue to live times"}
+                />
               </div>
             </form>
           ) : null}
@@ -473,6 +489,16 @@ function BoardroomBooking({
                 These times come from the admin calendar. Taken hours stay hidden. Canceled hours
                 return automatically.
               </p>
+              {briefMailFailed ? (
+                <p className="mb-4 font-manrope text-[13px] text-red-400">
+                  The brief email did not send. You can still lock a time. Email admin@wecall247.com
+                  if you do not get a confirmation.
+                </p>
+              ) : (
+                <p className="mb-4 font-manrope text-[13px] text-gold">
+                  Brief sent to admin@wecall247.com. After you lock an hour we email you too.
+                </p>
+              )}
 
               {CALENDLY_URL ? (
                 <CalendlyEmbed

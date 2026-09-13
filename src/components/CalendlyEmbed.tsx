@@ -45,9 +45,25 @@ function loadScript() {
   });
 }
 
+function calendlyEventName(raw: unknown): string {
+  let data = raw;
+  if (typeof data === "string") {
+    try {
+      data = JSON.parse(data);
+    } catch {
+      return data.toLowerCase().includes("event_scheduled") ? "calendly.event_scheduled" : "";
+    }
+  }
+  if (!data || typeof data !== "object") return "";
+  const event = (data as { event?: unknown }).event;
+  return typeof event === "string" ? event : "";
+}
+
 export function CalendlyEmbed({ url, name, email, onScheduled }: Props) {
   const host = useRef<HTMLDivElement>(null);
+  const onScheduledRef = useRef(onScheduled);
   const { theme } = useTheme();
+  onScheduledRef.current = onScheduled;
 
   useEffect(() => {
     const node = host.current;
@@ -68,8 +84,10 @@ export function CalendlyEmbed({ url, name, email, onScheduled }: Props) {
 
     const onMessage = (event: MessageEvent) => {
       const origin = String(event.origin || "");
-      if (!origin.includes("calendly.com")) return;
-      if (event.data?.event === "calendly.event_scheduled") onScheduled();
+      if (origin && !origin.includes("calendly.com")) return;
+      if (calendlyEventName(event.data).includes("event_scheduled")) {
+        onScheduledRef.current();
+      }
     };
     window.addEventListener("message", onMessage);
 
@@ -78,7 +96,7 @@ export function CalendlyEmbed({ url, name, email, onScheduled }: Props) {
       window.removeEventListener("message", onMessage);
       node.innerHTML = "";
     };
-  }, [url, name, email, onScheduled, theme]);
+  }, [url, name, email, theme]);
 
   return <div ref={host} className="qt-calendly" />;
 }

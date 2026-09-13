@@ -35,6 +35,14 @@ type MailCopy = {
   replyTo: string;
 };
 
+let ready = false;
+
+function ensureClient() {
+  if (ready) return;
+  emailjs.init({ publicKey: PUBLIC_KEY });
+  ready = true;
+}
+
 function briefParams(data: BookingPayload) {
   return {
     name: data.name,
@@ -58,52 +66,47 @@ function briefParams(data: BookingPayload) {
 }
 
 function sendOne(data: BookingPayload, copy: MailCopy) {
-  return emailjs.send(
-    SERVICE_ID,
-    TEMPLATE_ID,
-    {
-      ...briefParams(data),
-      to_email: copy.toEmail,
-      to_name: copy.toName,
-      title: copy.title,
-      headline: copy.headline,
-      intro: copy.intro,
-      reply_to: copy.replyTo,
-    },
-    { publicKey: PUBLIC_KEY },
-  );
+  ensureClient();
+  return emailjs.send(SERVICE_ID, TEMPLATE_ID, {
+    ...briefParams(data),
+    to_email: copy.toEmail,
+    to_name: copy.toName,
+    title: copy.title,
+    headline: copy.headline,
+    intro: copy.intro,
+    reply_to: copy.replyTo,
+  });
 }
 
 function pause(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function sendBookingEmail(data: BookingPayload) {
-  const guest = data.email.trim();
-  const results = await Promise.allSettled([
-    sendOne(data, {
-      toEmail: BOOKING_INBOX,
-      toName: "WeCall Admin",
-      title: "New boardroom booking",
-      headline: "session locked.",
-      intro: "A new acquisition desk just booked a mapping session. Review the brief before the call.",
-      replyTo: guest,
-    }),
-    pause(1200).then(() =>
-      sendOne(data, {
-        toEmail: guest,
-        toName: data.name,
-        title: "Your boardroom session is scheduled",
-        headline: "session scheduled.",
-        intro: "Your mapping session is locked. Keep this email for the details. WeCall will review the brief before the call.",
-        replyTo: BOOKING_INBOX,
-      }),
-    ),
-  ]);
+export function sendAdminBrief(data: BookingPayload) {
+  return sendOne(data, {
+    toEmail: BOOKING_INBOX,
+    toName: "WeCall Admin",
+    title: "New boardroom brief",
+    headline: "session locked.",
+    intro: "A new acquisition desk submitted a boardroom brief. Review it before the call.",
+    replyTo: data.email.trim(),
+  });
+}
 
-  const failed = results.filter((result) => result.status === "rejected");
-  if (failed.length === results.length) {
-    const reason = failed[0].status === "rejected" ? failed[0].reason : null;
-    throw reason instanceof Error ? reason : new Error("Booking emails could not send.");
-  }
+export function sendGuestConfirmation(data: BookingPayload) {
+  const guest = data.email.trim();
+  return sendOne(data, {
+    toEmail: guest,
+    toName: data.name,
+    title: "Your boardroom session is scheduled",
+    headline: "session scheduled.",
+    intro: "Your mapping session is locked. Keep this email for the details. WeCall will review the brief before the call.",
+    replyTo: BOOKING_INBOX,
+  });
+}
+
+export async function sendBookingEmail(data: BookingPayload) {
+  await sendAdminBrief(data);
+  await pause(1200);
+  await sendGuestConfirmation(data);
 }

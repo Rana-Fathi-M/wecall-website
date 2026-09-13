@@ -38,7 +38,7 @@ const sections = [
     n: "04",
     title: "Fees, seats, and changes",
     body: [
-      "Published prices, seat caps, and “cohort seats left” figures are current estimates and may change as capacity fills. Annual and monthly figures on the site are invitations to treat, not a binding quote, until confirmed in an order or agreement.",
+      "Published prices and seat caps are current estimates and may change as capacity fills. Annual and monthly figures on the site are invitations to treat, not a binding quote, until confirmed in an order or agreement.",
       "If a paid engagement starts, the scope, term, payment schedule, and cancellation rules in that written agreement control over marketing copy on this site.",
     ],
   },

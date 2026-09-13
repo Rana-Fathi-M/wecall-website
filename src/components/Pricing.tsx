@@ -324,7 +324,7 @@ export function Pricing() {
 
       <div className="pr-urgency keep-dark relative z-30 mx-auto mt-10 flex max-w-2xl items-center justify-between gap-3 rounded-full border border-gold/40 bg-[#1f2329] px-3 py-2 text-white md:sticky md:bottom-5 md:px-6 md:py-2.5">
         <p className="min-w-0 font-manrope text-[11px] leading-snug md:text-[13px]">
-          2 of 10 Upcoming Millionaire seats left — $1,000 off the next 3 clients
+          $1,000 off the next 3 Upcoming Millionaire clients
         </p>
         <ClaimSeatCta compact tight className="shrink-0" />
       </div>

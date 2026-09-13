@@ -283,7 +283,7 @@ export function Quote() {
               </div>
               <p className="mt-3 flex items-start gap-2 font-manrope text-[10px] leading-snug tracking-[0.1em] text-gold uppercase md:mt-5 md:text-[11px] md:tracking-[0.12em]">
                 <span className="seat-pulse mt-1 inline-block h-2 w-2 shrink-0 rounded-full bg-gold" />
-                2 of 10 seats left — reviewed in 24 hours
+                Capped at 10 desks — reviewed in 24 hours
               </p>
             </aside>
           </div>
@@ -391,7 +391,7 @@ function BoardroomBooking({
       <span className="qt-step-mark">0{view}</span>
       <p className="relative mb-2 flex items-center gap-2 font-manrope text-[11px] font-bold tracking-[0.22em] text-gold uppercase">
         <span className="seat-pulse inline-block h-2 w-2 rounded-full bg-gold" />
-        2 of 10 seats left — reviewed in 24 hours
+        Capped at 10 desks — reviewed in 24 hours
       </p>
       <h3 className="relative font-nohemi text-[28px] leading-[0.95] font-semibold md:text-[48px]">
         Secure Your Boardroom Session

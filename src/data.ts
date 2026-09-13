@@ -120,7 +120,7 @@ export const pricingRows = [
   ["Multi-Line Predictive Dialer License", "Included", "Included", "Included"],
   ["4-Pillars QA Lead Verification", "Real-Time Monitoring", "Real-Time QA Voice Monitoring & Daily Coaching", "Included"],
   ["CRM Integration & Follow-up Workflows", "Included", "Included", "Included"],
-  ["Allocations Available", "Limited", "2 of 10 seats left", "Open"],
+  ["Allocations Available", "Limited", "Capped at 10 desks", "Open"],
 ];
 
 export const tiers = [
@@ -150,7 +150,7 @@ export const tiers = [
     period: "/ month",
     tag: "Next 3 clients: $1,000 off — regularly $6,500/mo",
     cta: "Lock In $5,500 Discount",
-    seats: "2 of 10 seats left",
+    seats: "Capped at 10 desks",
     featured: true,
     headline: "The Complete Acquisition Desk",
     intro:
@@ -209,7 +209,7 @@ export const timeline = [
   {
     year: "10",
     title: "Capped investor seats",
-    copy: "WeCall enforces a strict limit of 10 active acquisition desks at a time. Two Upcoming Millionaire cohort seats are left.",
+    copy: "WeCall enforces a strict limit of 10 active acquisition desks at a time so every campaign stays managed.",
     photo: photos.seats,
   },
 ];

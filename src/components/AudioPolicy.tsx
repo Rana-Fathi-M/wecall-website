@@ -79,7 +79,7 @@ export function AudioPolicy() {
         <p className="ap-copy mx-auto mt-4 max-w-2xl font-manrope text-[13px] leading-relaxed text-white/75 md:mt-8 md:text-[16px]">
           Tired of leads that go nowhere? Live caller recordings stay off this page to
           protect your deals, our callers, and active NDAs. Hear the elite roster on a
-          private strategy call — two Upcoming Millionaire seats left.
+          private strategy call. Capped at 10 active desks.
         </p>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2 md:mt-8">

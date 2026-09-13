@@ -1,6 +1,6 @@
 export const CALENDLY_URL =
   (import.meta.env.VITE_CALENDLY_URL ?? "").trim() ||
-  "https://calendly.com/rana-fathi-rana/30min";
+  "https://calendly.com/admin-wecall247/30min";
 
 const THEMES = {
   dark: {

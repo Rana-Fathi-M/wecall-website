@@ -70,7 +70,7 @@ const stats = [
   { n: 10, pad: 2, label: "Active desks at a time" },
   { n: 45, pad: 2, label: "Leads per agent / month" },
   { n: 14, pad: 2, label: "Day onboarding" },
-  { n: 2, pad: 2, label: "Cohort seats left" },
+  { n: 100, pad: 3, label: "Data ownership" },
 ];
 
 const headline = ["Built", "for", "investors", "who", "want", "closed", "escrows,", "not", "another", "BPO."];

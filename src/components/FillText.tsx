@@ -17,24 +17,30 @@ export function FillText() {
   const root = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    const mobile = window.matchMedia("(max-width: 767px)").matches;
+    if (mobile) ScrollTrigger.config({ ignoreMobileResize: true });
+
     const ctx = gsap.context(() => {
       const letters = gsap.utils.toArray<HTMLElement>(".fill-letter");
       gsap.set(letters, { color: "rgba(255,255,255,0.12)" });
-      gsap.set(".fill-curve", { yPercent: 72 });
+      gsap.set(".fill-curve", { yPercent: mobile ? 58 : 72 });
 
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: root.current,
           start: "top top",
-          end: "+=30%",
-          scrub: 0.28,
+          end: mobile ? "+=85%" : "+=30%",
+          scrub: mobile ? true : 0.28,
           pin: true,
+          anticipatePin: 1,
+          fastScrollEnd: mobile,
+          invalidateOnRefresh: true,
         },
       });
 
       tl.to(letters, {
         color: "#ffffff",
-        stagger: 0.038,
+        stagger: mobile ? 0.022 : 0.038,
         ease: "none",
         duration: 0.2,
       }).to(
@@ -42,9 +48,9 @@ export function FillText() {
         {
           yPercent: 0,
           ease: "none",
-          duration: 0.85,
+          duration: mobile ? 0.55 : 0.85,
         },
-        0.2,
+        0.18,
       );
     }, root);
     return () => ctx.revert();
@@ -56,7 +62,7 @@ export function FillText() {
         <ThemePhoto
           light={photos.seats.light}
           dark={photos.seats.dark}
-          className="absolute inset-0 h-full w-full scale-[1.04] object-cover"
+          className="absolute inset-0 h-full w-full object-cover md:scale-[1.04]"
         />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(25,29,35,0.28)_0%,rgba(25,29,35,0.62)_58%,rgba(25,29,35,0.88)_100%)]" />
         <div className="absolute inset-0 bg-gradient-to-b from-ink/55 via-transparent to-ink/70" />

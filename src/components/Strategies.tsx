@@ -38,10 +38,10 @@ export function Strategies() {
   return (
     <section ref={root} id="strategies" className="st-band relative z-[3]">
       <div className="st-marquee keep-dark relative">
-        <div className="overflow-hidden py-7 md:py-10">
-          <div className="marquee-track flex w-max font-nohemi text-[12vw] leading-none font-light text-white/40 md:text-[15vw]">
+        <div className="overflow-hidden py-2.5 md:py-10">
+          <div className="marquee-track flex w-max font-nohemi text-[7.2vw] leading-none font-light text-[#eddcc4] md:text-[15vw] md:text-white/40">
             {Array.from({ length: 6 }).map((_, i) => (
-              <span key={i} className="px-8 whitespace-nowrap">
+              <span key={i} className="px-5 whitespace-nowrap md:px-8">
                 WeCall Acquisition
               </span>
             ))}
@@ -51,8 +51,8 @@ export function Strategies() {
 
       <Moving3D />
 
-      <div className="st-grid-wrap relative overflow-x-clip py-10 md:py-24">
-        <div className="overflow-hidden border-y border-white/15 py-4">
+      <div className="st-grid-wrap relative overflow-x-clip py-5 md:py-24">
+        <div className="overflow-hidden border-y border-white/15 py-2.5 md:py-4">
           <div className="marquee-track flex w-max font-nohemi text-[28px] font-light text-white uppercase md:text-[88px]">
             {Array.from({ length: 6 }).map((_, i) => (
               <span key={i} className="px-4">

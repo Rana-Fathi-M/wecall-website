@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type FormEvent, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CALENDLY_URL } from "../lib/calendly";
@@ -288,53 +288,15 @@ export function Quote() {
           </div>
         </div>
 
-        <BoardroomBooking
-          desk={`${callers} agent${callers === 1 ? "" : "s"} · LM ${leadManager ? "yes" : "no"} · closer ${acq ? "yes" : "no"} · data ${includeData ? "included" : "excluded"} · $${price.toLocaleString()}/mo · SMS ${sms === "yes" ? "inject" : "discuss"}`}
-        />
+        <BoardroomBooking />
       </div>
     </section>
   );
 }
 
-type Brief = {
-  name: string;
-  email: string;
-  phone: string;
-  market: string;
-  bottleneck: string;
-};
-
-function BoardroomBooking({ desk }: { desk: string }) {
-  const [view, setView] = useState(1);
-  const [brief, setBrief] = useState<Brief | null>(null);
+function BoardroomBooking() {
   const [status, setStatus] = useState<"idle" | "sent">("idle");
-  const [error, setError] = useState("");
   const locked = useRef(false);
-
-  const goTo = (n: number) => {
-    if (n === 1 || (n === 2 && brief)) setView(n);
-  };
-
-  const continueToCalendar = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = new FormData(e.currentTarget);
-    const next: Brief = {
-      name: String(form.get("name") || ""),
-      email: String(form.get("email") || ""),
-      phone: String(form.get("phone") || ""),
-      market: String(form.get("market") || ""),
-      bottleneck: String(form.get("bottleneck") || ""),
-    };
-
-    if (!isName(next.name) || !isEmail(next.email) || !isPhone(next.phone)) {
-      setError("Name, email, and phone are required before a time can lock.");
-      return;
-    }
-
-    setError("");
-    setBrief(next);
-    setView(2);
-  };
 
   const onScheduled = useCallback(() => {
     if (locked.current) return;
@@ -344,7 +306,6 @@ function BoardroomBooking({ desk }: { desk: string }) {
 
   return (
     <div id="boardroom" className="qt-book qt-ticket qt-frame relative mt-4 overflow-x-clip p-4 md:mt-8 md:p-10 lg:p-12">
-      <span className="qt-step-mark">0{view}</span>
       <p className="relative mb-2 flex items-center gap-2 font-manrope text-[11px] font-bold tracking-[0.22em] text-gold uppercase">
         <span className="seat-pulse inline-block h-2 w-2 rounded-full bg-gold" />
         Capped at 10 desks — reviewed in 24 hours
@@ -354,28 +315,8 @@ function BoardroomBooking({ desk }: { desk: string }) {
       </h3>
       <span className="relative mt-4 block h-px w-14 bg-gold/50" />
       <p className="relative mt-4 max-w-2xl font-manrope text-[16px] leading-relaxed font-medium text-[color:var(--qt-muted)] md:text-[19px]">
-        The admin sets open hours in Calendly. When you take a slot it locks for everyone. If the
-        meeting is canceled, that hour shows again on this page.
+        Choose a time. You’ll receive a confirmation once the hour is reserved.
       </p>
-
-      <ol className="qt-book-steps qt-book-steps-2 relative mt-8">
-        {[
-          ["01", "Details"],
-          ["02", "Schedule"],
-        ].map(([n, label], i) => {
-          const index = i + 1;
-          const current = view === index;
-          const done = index === 1 ? !!brief : status === "sent";
-          return (
-            <li key={label} className={`${current ? "is-active is-current" : ""} ${done ? "is-done" : ""}`}>
-              <button type="button" disabled={index === 2 && !brief} onClick={() => goTo(index)}>
-                <span>{done && !current ? "✓" : n}</span>
-                {label}
-              </button>
-            </li>
-          );
-        })}
-      </ol>
 
       {status === "sent" ? (
         <div className="lock-burst relative mt-10 rounded-2xl border border-gold/40 bg-gold/10 px-6 py-16 text-center">
@@ -390,73 +331,18 @@ function BoardroomBooking({ desk }: { desk: string }) {
           </p>
         </div>
       ) : (
-        <div className="qt-wizard relative mt-8">
-          {view === 1 ? (
-            <form className="qt-form qt-wizard-pane mx-auto max-w-3xl space-y-4 md:space-y-7" onSubmit={continueToCalendar}>
-              <p className="font-manrope text-[13px] font-bold tracking-[0.22em] text-gold uppercase">
-                Step 01 · Your details
+        <div className="relative mt-8 mx-auto max-w-3xl">
+          {CALENDLY_URL ? (
+            <CalendlyEmbed url={CALENDLY_URL} onScheduled={onScheduled} />
+          ) : (
+            <div className="rounded-2xl border border-gold/35 bg-gold/10 px-5 py-10 text-center">
+              <p className="font-nohemi text-[22px] font-semibold">Calendar not connected yet</p>
+              <p className="mx-auto mt-3 max-w-md font-manrope text-[14px] text-[color:var(--qt-muted)]">
+                Add the admin Calendly event link as <span className="text-gold">VITE_CALENDLY_URL</span>{" "}
+                so live availability can lock and reopen on this page.
               </p>
-              <p className="font-manrope text-[15px] text-[color:var(--qt-muted)]">
-                Name, email, and phone first. Calendly emails the locked time after you pick an hour.
-              </p>
-
-              <div className="qt-form-fields grid grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-8">
-                <Field label="Name" name="name" autoComplete="name" validate={isName} />
-                <Field label="Email" name="email" type="email" autoComplete="email" validate={isEmail} />
-                <Field label="Phone Number" name="phone" type="tel" autoComplete="tel" validate={isPhone} />
-              </div>
-
-              <Field label="Target Market & Buy-Box (optional)" name="market" as="textarea" required={false} validate={() => true} />
-              <Field label="Core Operational Bottleneck (optional)" name="bottleneck" as="textarea" required={false} validate={() => true} />
-
-              {error ? <p className="font-manrope text-[13px] text-red-400">{error}</p> : null}
-
-              <div className="qt-submit-bar">
-                <ClaimSeatCta type="submit" wide busyLabel="Continue to live times" />
-              </div>
-            </form>
-          ) : null}
-
-          {view === 2 && brief ? (
-            <div className="qt-wizard-pane mx-auto max-w-3xl">
-              <p className="font-manrope text-[13px] font-bold tracking-[0.22em] text-gold uppercase">
-                Step 02 · Lock a live hour
-              </p>
-              <p className="mt-2 mb-5 font-manrope text-[15px] text-[color:var(--qt-muted)]">
-                Choose a time below. Calendly locks that hour and emails you and WeCall from your
-                Calendly template.
-              </p>
-
-              {CALENDLY_URL ? (
-                <CalendlyEmbed
-                  url={CALENDLY_URL}
-                  name={brief.name}
-                  email={brief.email}
-                  answers={[
-                    brief.phone,
-                    brief.market.trim() || "Not specified",
-                    brief.bottleneck.trim() || "Not specified",
-                    desk,
-                  ]}
-                  onScheduled={onScheduled}
-                />
-              ) : (
-                <div className="rounded-2xl border border-gold/35 bg-gold/10 px-5 py-10 text-center">
-                  <p className="font-nohemi text-[22px] font-semibold">Calendar not connected yet</p>
-                  <p className="mx-auto mt-3 max-w-md font-manrope text-[14px] text-[color:var(--qt-muted)]">
-                    Add the admin Calendly event link as <span className="text-gold">VITE_CALENDLY_URL</span>{" "}
-                    so live availability can lock and reopen on this page.
-                  </p>
-                </div>
-              )}
-
-              <div className="qt-wizard-nav">
-                <button type="button" className="qt-back" onClick={() => goTo(1)}>
-                  Back
-                </button>
-              </div>
             </div>
-          ) : null}
+          )}
         </div>
       )}
     </div>
@@ -521,55 +407,3 @@ function ToggleModule({
   );
 }
 
-const isName = (v: string) => v.trim().length >= 2;
-const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
-const isPhone = (v: string) => v.replace(/\D/g, "").length >= 10;
-
-function Field({
-  label,
-  name,
-  type = "text",
-  as,
-  autoComplete,
-  validate,
-  required = true,
-}: {
-  label: string;
-  name: string;
-  type?: string;
-  as?: "textarea";
-  autoComplete?: string;
-  validate: (value: string) => boolean;
-  required?: boolean;
-}) {
-  const [valid, setValid] = useState(false);
-
-  return (
-    <label className={`qt-field qt-float group ${valid ? "is-valid" : ""} ${type === "date" ? "is-date" : ""}`}>
-      {as === "textarea" ? (
-        <textarea
-          name={name}
-          rows={4}
-          required={required}
-          placeholder=" "
-          className="qt-input qt-float-input"
-          onInput={(e) => setValid(validate((e.target as HTMLTextAreaElement).value))}
-        />
-      ) : (
-        <input
-          name={name}
-          type={type}
-          required={required}
-          autoComplete={autoComplete}
-          placeholder=" "
-          className="qt-input qt-float-input"
-          onInput={(e) => setValid(validate((e.target as HTMLInputElement).value))}
-        />
-      )}
-      <span className="qt-float-label">{label}</span>
-      <span className="qt-float-check" aria-hidden>
-        ✓
-      </span>
-    </label>
-  );
-}

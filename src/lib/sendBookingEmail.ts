@@ -29,6 +29,8 @@ export type BookingPayload = {
   sms: string;
   price: number;
   dataIncluded: boolean;
+  calendlyEvent?: string;
+  calendlyInvitee?: string;
 };
 
 type MailCopy = {
@@ -67,6 +69,8 @@ function briefParams(data: BookingPayload) {
     sms: data.sms,
     data_included: data.dataIncluded ? "Included" : "Excluded (−$200 / agent)",
     price: `$${data.price.toLocaleString()}/mo`,
+    calendly_event: data.calendlyEvent || "Sent on the Calendly confirmation",
+    calendly_invitee: data.calendlyInvitee || "Sent on the Calendly confirmation",
   };
 }
 

@@ -1,12 +1,13 @@
 import { useEffect, useRef } from "react";
 import { calendlyWidgetUrl } from "../lib/calendly";
+import { parseCalendlyPayload, type CalendlySchedule } from "../lib/calendlyEvent";
 import { useTheme } from "../context/ThemeContext";
 
 type Props = {
   url: string;
   name?: string;
   email?: string;
-  onScheduled: () => void;
+  onScheduled: (schedule: CalendlySchedule) => void;
 };
 
 declare global {
@@ -62,6 +63,7 @@ function calendlyEventName(raw: unknown): string {
 export function CalendlyEmbed({ url, name, email, onScheduled }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const onScheduledRef = useRef(onScheduled);
+  const picked = useRef<CalendlySchedule>({});
   const { theme } = useTheme();
   onScheduledRef.current = onScheduled;
 
@@ -70,6 +72,7 @@ export function CalendlyEmbed({ url, name, email, onScheduled }: Props) {
     if (!node) return;
     let gone = false;
     node.innerHTML = "";
+    picked.current = {};
 
     loadScript()
       .then(() => {
@@ -85,8 +88,13 @@ export function CalendlyEmbed({ url, name, email, onScheduled }: Props) {
     const onMessage = (event: MessageEvent) => {
       const origin = String(event.origin || "");
       if (origin && !origin.includes("calendly.com")) return;
-      if (calendlyEventName(event.data).includes("event_scheduled")) {
-        onScheduledRef.current();
+      const name = calendlyEventName(event.data);
+      const parsed = parseCalendlyPayload(event.data);
+      if (name.includes("date_and_time_selected") || name.includes("event_scheduled")) {
+        picked.current = { ...picked.current, ...parsed };
+      }
+      if (name.includes("event_scheduled")) {
+        onScheduledRef.current(picked.current);
       }
     };
     window.addEventListener("message", onMessage);

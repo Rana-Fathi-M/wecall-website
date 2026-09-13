@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent, type RefObject } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { describeEmailError, sendAdminBrief, sendBookingEmail, type BookingPayload } from "../lib/sendBookingEmail";
+import { describeEmailError, sendBookingEmail, type BookingPayload } from "../lib/sendBookingEmail";
 import { CALENDLY_URL } from "../lib/calendly";
+import { formatCalendlyTimes, type CalendlySchedule } from "../lib/calendlyEvent";
 import { CalendlyEmbed } from "./CalendlyEmbed";
 import { ClaimSeatCta } from "./ClaimSeatCta";
 
@@ -330,34 +331,38 @@ function BoardroomBooking({
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
   const [error, setError] = useState("");
   const [briefMailFailed, setBriefMailFailed] = useState(false);
-  const [sendingBrief, setSendingBrief] = useState(false);
   const locked = useRef(false);
 
-  const payloadFrom = (next: Brief, meeting: "picking" | "locked"): BookingPayload => ({
-    name: next.name,
-    email: next.email,
-    phone: next.phone,
-    startDate: meeting === "locked" ? "Locked in Calendly" : "Selecting a Calendly hour",
-    market: next.market,
-    bottleneck: next.bottleneck,
-    meetingDate: meeting === "locked" ? "Confirmed in Calendly" : "Time not locked yet",
-    meetingTime: meeting === "locked" ? "See Calendly confirmation email" : "Investor is picking a live hour",
-    timezone: meeting === "locked" ? "Invitee timezone in Calendly" : "Pending Calendly",
-    ownerTimezone: "Africa/Cairo",
-    ownerTime: meeting === "locked" ? "Shown on the admin Calendly calendar" : "Pending Calendly",
-    callers,
-    leadManager,
-    closer: acq,
-    sms: sms === "yes" ? "Inject into Build" : "Discuss on Consult",
-    price,
-    dataIncluded: includeData,
-  });
+  const payloadFrom = (next: Brief, schedule: CalendlySchedule = {}): BookingPayload => {
+    const times = formatCalendlyTimes(schedule);
+    return {
+      name: next.name,
+      email: next.email,
+      phone: next.phone,
+      startDate: times.meetingDate,
+      market: next.market,
+      bottleneck: next.bottleneck,
+      meetingDate: times.meetingDate,
+      meetingTime: times.meetingTime,
+      timezone: times.timezone,
+      ownerTimezone: times.ownerTimezone,
+      ownerTime: times.ownerTime,
+      callers,
+      leadManager,
+      closer: acq,
+      sms: sms === "yes" ? "Inject into Build" : "Discuss on Consult",
+      price,
+      dataIncluded: includeData,
+      calendlyEvent: schedule.eventUri,
+      calendlyInvitee: schedule.inviteeUri,
+    };
+  };
 
   const goTo = (n: number) => {
     if (n === 1 || (n === 2 && brief)) setView(n);
   };
 
-  const continueToCalendar = async (e: FormEvent<HTMLFormElement>) => {
+  const continueToCalendar = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     const next: Brief = {
@@ -374,25 +379,17 @@ function BoardroomBooking({
     }
 
     setError("");
-    setSendingBrief(true);
     setBriefMailFailed(false);
     setBrief(next);
     setView(2);
-    try {
-      await sendAdminBrief(payloadFrom(next, "picking"));
-    } catch (err) {
-      setBriefMailFailed(true);
-      setError(describeEmailError(err));
-    }
-    setSendingBrief(false);
   };
 
-  const onScheduled = useCallback(async () => {
+  const onScheduled = useCallback(async (schedule: CalendlySchedule) => {
     if (!brief || locked.current) return;
     locked.current = true;
     setStatus("sending");
     try {
-      await sendBookingEmail(payloadFrom(brief, "locked"));
+      await sendBookingEmail(payloadFrom(brief, schedule));
       setBriefMailFailed(false);
       setError("");
     } catch (err) {
@@ -455,10 +452,10 @@ function BoardroomBooking({
           {view === 1 ? (
             <form className="qt-form qt-wizard-pane mx-auto max-w-3xl space-y-4 md:space-y-7" onSubmit={continueToCalendar}>
               <p className="font-manrope text-[13px] font-bold tracking-[0.22em] text-gold uppercase">
-                Step 01 · Send the brief
+                Step 01 · Your details
               </p>
               <p className="font-manrope text-[15px] text-[color:var(--qt-muted)]">
-                Name, email, and phone first. Then Calendly shows only hours the admin left open.
+                Name, email, and phone first. Nothing is emailed until you lock a Calendly hour.
               </p>
 
               <div className="qt-form-fields grid grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-8">
@@ -473,12 +470,7 @@ function BoardroomBooking({
               {error ? <p className="font-manrope text-[13px] text-red-400">{error}</p> : null}
 
               <div className="qt-submit-bar">
-                <ClaimSeatCta
-                  type="submit"
-                  wide
-                  disabled={sendingBrief}
-                  busyLabel={sendingBrief ? "Sending brief to WeCall…" : "Continue to live times"}
-                />
+                <ClaimSeatCta type="submit" wide busyLabel="Continue to live times" />
               </div>
             </form>
           ) : null}
@@ -490,23 +482,9 @@ function BoardroomBooking({
               </p>
               <p className="mt-2 mb-5 font-manrope text-[15px] text-[color:var(--qt-muted)]">
                 These times come from the admin calendar. Taken hours stay hidden. Canceled hours
-                return automatically.
+                return automatically. WeCall emails you and admin@wecall247.com only after this
+                hour locks.
               </p>
-              {sendingBrief ? (
-                <p className="mb-4 font-manrope text-[13px] text-gold">
-                  Sending the brief to admin@wecall247.com. Pick an hour below — you do not need to
-                  wait for that email.
-                </p>
-              ) : briefMailFailed ? (
-                <p className="mb-4 font-manrope text-[13px] text-red-400">
-                  The brief email did not send, but you can still lock a time.
-                  {error ? ` ${error}` : ""}
-                </p>
-              ) : (
-                <p className="mb-4 font-manrope text-[13px] text-gold">
-                  Brief sent to admin@wecall247.com. After you lock an hour we email you too.
-                </p>
-              )}
 
               {CALENDLY_URL ? (
                 <CalendlyEmbed

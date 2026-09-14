@@ -2044,6 +2044,10 @@ html.light .ap-glow {
     max-width: 82vw !important;
   }
 
+  .intro-script {
+    top: 30% !important;
+  }
+
   .plus-circle-lg {
     bottom: 8px;
     height: 96px;

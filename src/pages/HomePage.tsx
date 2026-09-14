@@ -8,7 +8,7 @@ import { Services } from "../components/Services";
 // import { AudioPolicy } from "../components/AudioPolicy";
 import { Workflow } from "../components/Workflow";
 import { About } from "../components/About";
-import { TrackRecord } from "../components/TrackRecord";
+import { SuccessStories } from "../components/SuccessStories";
 import { Pricing } from "../components/Pricing";
 import { Quote } from "../components/Quote";
 
@@ -25,7 +25,7 @@ export function HomePage() {
       {/* <AudioPolicy /> */}
       <Workflow />
       <About />
-      <TrackRecord />
+      <SuccessStories />
       <Pricing />
       <Quote />
     </main>

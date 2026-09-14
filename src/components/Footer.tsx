@@ -83,6 +83,12 @@ export function Footer() {
       >
         admin@wecall247.com
       </a>
+      <a
+        href="tel:+13322447472"
+        className="ft-copy mt-3 block font-nohemi text-[22px] tracking-[0.06em] text-gold/90 transition-colors hover:text-white md:mt-5 md:text-[32px]"
+      >
+        (332) 244-7472
+      </a>
       <p className="ft-copy mt-4 font-manrope text-[12px] text-white/70 md:mt-6 md:text-sm">
         Turnkey offshore acquisition desks
       </p>
@@ -97,7 +103,7 @@ export function Footer() {
       <div className="ft-copy mt-8 flex justify-center gap-5 md:mt-12 md:gap-6">
         <Social href="https://www.linkedin.com/company/146253252/" src={asset("assets/icons/linkedin.svg")} label="LinkedIn" />
         <Social href="https://www.facebook.com/profile.php?id=61593684287739" src={asset("assets/icons/facebook.svg")} label="Facebook" />
-        <Social href="#" src={asset("assets/icons/instagram.svg")} label="Instagram" />
+        <Social href="https://www.instagram.com/wecall247" src={asset("assets/icons/instagram.svg")} label="Instagram" />
       </div>
 
       <div className="ft-legal mx-auto mt-8 grid max-w-5xl grid-cols-2 items-center gap-3 border-t border-white/10 pt-5 font-manrope text-[10px] tracking-widest text-white/40 uppercase md:mt-16 md:flex md:justify-between md:pt-6 md:text-[11px]">

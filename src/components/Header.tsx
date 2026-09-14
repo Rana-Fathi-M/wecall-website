@@ -17,8 +17,10 @@ export function Header({ onOpenMenu }: Props) {
     const onScroll = () => {
       const y = window.scrollY;
       const mobile = window.matchMedia("(max-width: 767px)").matches;
-      setHidden(!mobile && y > last && y > 90);
-      setScrolled(y > 16);
+      const nextHidden = !mobile && y > last && y > 90;
+      const nextScrolled = y > 16;
+      setHidden((prev) => (prev === nextHidden ? prev : nextHidden));
+      setScrolled((prev) => (prev === nextScrolled ? prev : nextScrolled));
       last = y;
     };
     onScroll();

@@ -26,8 +26,8 @@ export function Pricing() {
       if (mobile) {
         const joinedEl = node.querySelector(".pr-joined");
         if (joinedEl) joinedEl.textContent = "23";
-        gsap.set(".pr-bar", { scaleX: 0.92 });
-        gsap.set(".pr-arrow-escrow", { autoAlpha: 1, clearProps: "transform" });
+        const bar = node.querySelector<HTMLElement>(".pr-bar");
+        if (bar) bar.style.transform = "scaleX(0.92)";
         return;
       }
 

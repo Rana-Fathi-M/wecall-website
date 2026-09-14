@@ -1,13 +1,13 @@
 import { AboutNarrative } from "../components/AboutNarrative";
 import { HeroSlider } from "../components/HeroSlider";
-import { TrackRecord } from "../components/TrackRecord";
+import { SuccessStories } from "../components/SuccessStories";
 
 export function AboutPage() {
   return (
     <main>
       <HeroSlider />
       <AboutNarrative />
-      <TrackRecord />
+      <SuccessStories />
     </main>
   );
 }

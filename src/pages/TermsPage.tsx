@@ -78,9 +78,10 @@ const sections = [
     n: "09",
     title: "Contact & governing law",
     body: [
-      "Questions about these Terms or a booking: admin@wecall247.com",
+      "Questions about these Terms or a booking: admin@wecall247.com · (332) 244-7472",
       "Governing law: The laws applicable to WeCall’s operating entity, without regard to conflict-of-law rules. Courts of competent jurisdiction there have exclusive venue, unless a consumer statute requires otherwise.",
       "Contact Email: admin@wecall247.com",
+      "Contact Phone: (332) 244-7472",
       "Website: https://wecall.com",
       "Service: Lead generation and turnkey offshore acquisition desks for U.S. real estate investors",
     ],

@@ -130,6 +130,9 @@ export function Menu({ open, onClose }: Props) {
             <a href="mailto:admin@wecall247.com" className="mt-2 block text-[13px] opacity-70">
               admin@wecall247.com
             </a>
+            <a href="tel:+13322447472" className="mt-1 block text-[13px] opacity-70">
+              (332) 244-7472
+            </a>
           </div>
         </div>
       </div>

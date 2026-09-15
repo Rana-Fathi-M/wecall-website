@@ -12,7 +12,7 @@ type Cycle = "monthly" | "annual";
 const monthly = [1500, 5500] as const;
 const annual = [16500, 60500] as const;
 
-export function Pricing() {
+export function Pricing({ hideHeading = false }: { hideHeading?: boolean }) {
   const root = useRef<HTMLElement>(null);
   const [cycle, setCycle] = useState<Cycle>("monthly");
 
@@ -39,21 +39,23 @@ export function Pricing() {
         scrollTrigger: { trigger: root.current, start: "top 78%" },
       });
 
-      gsap.from(".pr-line", {
-        y: 80,
-        opacity: 0,
-        rotateX: 28,
-        stagger: 0.12,
-        duration: 1.05,
-        ease: "power3.out",
-        scrollTrigger: { trigger: ".pr-title", start: "top 80%" },
-      });
+      if (!hideHeading) {
+        gsap.from(".pr-line", {
+          y: 80,
+          opacity: 0,
+          rotateX: 28,
+          stagger: 0.12,
+          duration: 1.05,
+          ease: "power3.out",
+          scrollTrigger: { trigger: ".pr-title", start: "top 80%" },
+        });
+      }
 
       gsap.from(".pr-sub", {
         y: 30,
         opacity: 0,
         duration: 0.85,
-        scrollTrigger: { trigger: ".pr-title", start: "top 80%" },
+        scrollTrigger: { trigger: hideHeading ? ".pr-kicker" : ".pr-title", start: "top 80%" },
       });
 
       const launchTitleArrow = () => {
@@ -120,7 +122,7 @@ export function Pricing() {
         }
       };
 
-      launchTitleArrow();
+      if (!hideHeading) launchTitleArrow();
 
       const joined = { n: 0 };
       const joinedEl = node.querySelector(".pr-joined");
@@ -166,24 +168,32 @@ export function Pricing() {
     }, root);
 
     return () => ctx.revert();
-  }, []);
+  }, [hideHeading]);
 
   return (
-    <section ref={root} id="pricing" className="pr-section relative overflow-x-clip px-3 pb-24 pt-14 md:px-6 md:pb-32 md:pt-28">
+    <section
+      ref={root}
+      id="pricing"
+      className={`pr-section relative overflow-x-clip px-3 pb-24 md:px-6 md:pb-32 ${
+        hideHeading ? "pt-4 md:pt-8" : "pt-14 md:pt-28"
+      }`}
+    >
       <div className="pr-ambient pointer-events-none absolute top-0 left-1/2 -z-10 h-[420px] w-[90vw] max-w-[980px] -translate-x-1/2 rounded-full bg-gold/12 blur-[120px]" />
 
       <div className="pr-head relative z-10 mx-auto max-w-6xl text-center">
         <span className="pr-kicker mb-4 inline-block rounded-full border border-gold bg-gold px-5 py-1.5 font-manrope text-[13px] font-extrabold tracking-[0.22em] text-ink uppercase md:text-[15px]">
           The End of Dead Leads
         </span>
-        <h2 className="pr-title relative mt-4 font-nohemi text-[36px] leading-[0.9] font-semibold tracking-tight text-white sm:text-[60px] md:text-[92px]">
-          <span className="pr-line block">Stop Buying Leads.</span>
-          <span className="pr-line relative mt-2 inline-block font-mariyam text-[34px] font-normal leading-[1.05] text-gold sm:text-[52px] md:text-[76px]">
-            Start Closing Escrows.
-          </span>
-          <WowArrow className="pr-arrow-escrow" label="the money" />
-        </h2>
-        <p className="pr-sub mx-auto mt-5 max-w-3xl px-1 font-manrope text-[17px] leading-relaxed font-medium text-white/90 md:mt-8 md:text-[22px]">
+        {hideHeading ? null : (
+          <h2 className="pr-title relative mt-4 font-nohemi text-[36px] leading-[0.9] font-semibold tracking-tight text-white sm:text-[60px] md:text-[92px]">
+            <span className="pr-line block">Stop Buying Leads.</span>
+            <span className="pr-line relative mt-2 inline-block font-mariyam text-[34px] font-normal leading-[1.05] text-gold sm:text-[52px] md:text-[76px]">
+              Start Closing Escrows.
+            </span>
+            <WowArrow className="pr-arrow-escrow" label="the money" />
+          </h2>
+        )}
+        <p className={`pr-sub mx-auto max-w-3xl px-1 font-manrope text-[17px] leading-relaxed font-medium text-white/90 md:text-[22px] ${hideHeading ? "mt-4 md:mt-5" : "mt-5 md:mt-8"}`}>
           You don&apos;t need another list of recycled phone numbers. You need a ruthless, fully
           managed offshore acquisition desk engineered to lock up off-market deals while you sleep.
         </p>

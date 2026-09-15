@@ -1,9 +1,7 @@
-import { strategies } from "../data";
 import { Difference } from "../components/Difference";
 import { Strategies } from "../components/Strategies";
 import { ThemePhoto } from "../components/ThemePhoto";
 import { photos } from "../media";
-import { ClaimSeatCta } from "../components/ClaimSeatCta";
 
 export function StrategiesPage() {
   return (
@@ -38,24 +36,7 @@ export function StrategiesPage() {
 
       <Strategies />
 
-      <section className="grid grid-cols-2 gap-2 bg-ink px-3 py-10 md:gap-4 md:px-8 md:py-16">
-        {strategies.map((s) => (
-          <article key={s.slug} className="min-w-0 overflow-hidden">
-            <ThemePhoto light={s.photo.light} dark={s.photo.dark} className="h-[22vh] w-full bg-[#efe8e0] object-cover md:h-[46vh]" />
-            <div className="bg-cream px-3 py-4 text-ink md:px-6 md:py-8">
-              <p className="font-manrope text-[10px] text-ink/45 md:text-[12px]">{s.label}</p>
-              <h3 className="mt-1 font-nohemi text-[16px] leading-tight font-light md:mt-2 md:text-[32px]">{s.title}</h3>
-              <p className="mt-2 font-manrope text-[11px] leading-snug text-ink/70 md:mt-3 md:text-sm md:leading-relaxed">{s.copy}</p>
-            </div>
-          </article>
-        ))}
-      </section>
-
       <Difference />
-
-      <div className="bg-ink py-16 text-center">
-        <ClaimSeatCta />
-      </div>
     </main>
   );
 }

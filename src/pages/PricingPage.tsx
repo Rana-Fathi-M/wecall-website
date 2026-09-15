@@ -15,7 +15,7 @@ export function PricingPage() {
           Start Closing Escrows.
         </p>
       </section>
-      <Pricing />
+      <Pricing hideHeading />
       <Quote />
     </main>
   );

@@ -128,17 +128,17 @@ export function AboutNarrative() {
       const mobile = window.matchMedia("(max-width: 767px)").matches;
 
       cards.forEach((card, i) => {
-        gsap.set(card, { zIndex: i + 1, force3D: true });
-        if (reduce || mobile || i === cards.length - 1) return;
+        gsap.set(card, { zIndex: i + 1, force3D: !mobile });
+        if (reduce || i === cards.length - 1) return;
 
         gsap.to(card, {
-          scale: 0.96,
+          scale: mobile ? 0.97 : 0.96,
           ease: "none",
-          force3D: true,
+          force3D: !mobile,
           scrollTrigger: {
             trigger: cards[i + 1],
-            start: "top 90%",
-            end: "top 48%",
+            start: mobile ? "top 92%" : "top 90%",
+            end: mobile ? "top 58%" : "top 48%",
             scrub: 0.2,
           },
         });

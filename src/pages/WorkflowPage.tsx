@@ -1,8 +1,6 @@
-import { steps } from "../data";
 import { Workflow } from "../components/Workflow";
 import { ThemePhoto } from "../components/ThemePhoto";
 import { photos } from "../media";
-import { ClaimSeatCta } from "../components/ClaimSeatCta";
 
 export function WorkflowPage() {
   return (
@@ -27,24 +25,7 @@ export function WorkflowPage() {
         </div>
       </section>
 
-      <Workflow />
-
-      <section className="bg-ink px-3 py-14 text-white md:px-12 md:py-24">
-        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-4 md:gap-10">
-          {steps.map((s) => (
-            <article key={s.n} className="min-w-0 border-t border-white/20 pt-5 md:pt-8">
-              <p className="font-nohemi text-[32px] text-gold md:text-[48px]">{s.n}</p>
-              <h2 className="mt-2 font-nohemi text-[15px] leading-tight font-light md:mt-4 md:text-[32px]">
-                Step {s.n.replace("0", "")}: {s.title}
-              </h2>
-              <p className="mt-2 font-manrope text-[12px] leading-snug text-white/70 md:mt-4 md:text-[16px] md:leading-relaxed">{s.copy}</p>
-            </article>
-          ))}
-        </div>
-        <div className="mt-16 text-center">
-          <ClaimSeatCta />
-        </div>
-      </section>
+      <Workflow hideHeading />
     </main>
   );
 }

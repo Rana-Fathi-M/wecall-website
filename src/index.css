@@ -394,6 +394,24 @@ html.light .nav-theme {
 }
 
 @media (min-width: 1024px) {
+  .pr-urgency .nav-cta {
+    min-height: 48px;
+    min-width: 200px;
+    padding: 10px 26px 9px;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+  }
+
+  .pr-urgency .nav-cta .cta-line {
+    max-width: none;
+  }
+
+  .pr-urgency .nav-cta em {
+    margin-top: 3px;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+  }
+
   .site-header {
     padding: 22px 40px 0;
   }
@@ -3461,6 +3479,13 @@ html.light .qt-switch-knob {
   border-bottom: 1px solid rgba(196, 158, 123, 0.22);
 }
 
+.qt-review {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--qt-panel) 88%, #c49e7b);
+  border: 1px solid rgba(196, 158, 123, 0.38);
+}
+
 .qt-day,
 .qt-slot {
   transition:
@@ -4334,6 +4359,10 @@ html.light .qt-input[type="date"] {
 
   .qt-stat-value {
     font-size: 16px;
+  }
+
+  .qt-review {
+    padding: 8px 10px;
   }
 }
 

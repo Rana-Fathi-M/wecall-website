@@ -11,7 +11,9 @@ export function PricingPage() {
         <h1 className="mx-auto mt-3 max-w-5xl font-nohemi text-[28px] leading-[0.95] font-extralight md:mt-4 md:text-[80px]">
           Stop Buying Leads.
         </h1>
-        <p className="font-mariyam text-[48px] leading-none text-white md:text-[100px]">escrows</p>
+        <p className="mt-2 px-2 font-mariyam text-[34px] leading-[1.05] text-gold md:mt-3 md:text-[76px]">
+          Start Closing Escrows.
+        </p>
       </section>
       <Pricing />
       <Quote />

@@ -178,8 +178,8 @@ export function Pricing() {
         </span>
         <h2 className="pr-title relative mt-4 font-nohemi text-[36px] leading-[0.9] font-semibold tracking-tight text-white sm:text-[60px] md:text-[92px]">
           <span className="pr-line block">Stop Buying Leads.</span>
-          <span className="pr-line pr-escrow relative mt-2 inline-block">
-            Start Buying Closed Escrows.
+          <span className="pr-line relative mt-2 inline-block font-mariyam text-[34px] font-normal leading-[1.05] text-gold sm:text-[52px] md:text-[76px]">
+            Start Closing Escrows.
           </span>
           <WowArrow className="pr-arrow-escrow" label="the money" />
         </h2>
@@ -324,8 +324,8 @@ export function Pricing() {
         </div>
       </div>
 
-      <div className="pr-urgency keep-dark relative z-30 mx-auto mt-10 flex max-w-2xl items-center justify-between gap-3 rounded-full border border-gold/40 bg-[#1f2329] px-3 py-2 text-white md:sticky md:bottom-5 md:px-6 md:py-2.5">
-        <p className="min-w-0 font-manrope text-[11px] leading-snug md:text-[13px]">
+      <div className="pr-urgency keep-dark relative z-30 mx-auto mt-10 flex max-w-2xl items-center justify-between gap-3 rounded-full border border-gold/40 bg-[#1f2329] px-3 py-2 text-white md:sticky md:bottom-5 md:px-6 md:py-2.5 lg:max-w-3xl lg:gap-5 lg:px-7 lg:py-3">
+        <p className="min-w-0 font-manrope text-[11px] leading-snug md:text-[13px] lg:text-[15px]">
           $1,000 off Upcoming Millionaire — was $6,500 / mo
         </p>
         <ClaimSeatCta compact tight className="shrink-0" />

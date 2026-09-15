@@ -280,10 +280,15 @@ export function Quote() {
                   <p className="qt-stat-value">5 deals</p>
                 </div>
               </div>
-              <p className="mt-3 flex items-start gap-2 font-manrope text-[10px] leading-snug tracking-[0.1em] text-gold uppercase md:mt-5 md:text-[11px] md:tracking-[0.12em]">
-                <span className="seat-pulse mt-1 inline-block h-2 w-2 shrink-0 rounded-full bg-gold" />
-                Capped at 10 desks — reviewed in 24 hours
-              </p>
+              <div className="qt-review mt-3 md:mt-5">
+                <p className="flex items-center gap-2 font-manrope text-[10px] font-bold tracking-[0.16em] text-gold uppercase md:text-[11px]">
+                  <span className="seat-pulse inline-block h-2 w-2 shrink-0 rounded-full bg-gold" />
+                  For review
+                </p>
+                <p className="mt-1.5 font-manrope text-[12px] leading-snug text-[color:var(--qt-muted)] md:text-[13px]">
+                  Live custom-desk estimate — not a locked quote. We confirm your build within 24 hours.
+                </p>
+              </div>
             </aside>
           </div>
         </div>
@@ -308,7 +313,7 @@ function BoardroomBooking() {
     <div id="boardroom" className="qt-book qt-ticket qt-frame relative mt-4 overflow-x-clip p-4 md:mt-8 md:p-10 lg:p-12">
       <p className="relative mb-2 flex items-center gap-2 font-manrope text-[11px] font-bold tracking-[0.22em] text-gold uppercase">
         <span className="seat-pulse inline-block h-2 w-2 rounded-full bg-gold" />
-        Capped at 10 desks — reviewed in 24 hours
+        Custom desk for review — confirmed in 24 hours
       </p>
       <h3 className="relative font-nohemi text-[28px] leading-[0.95] font-semibold md:text-[48px]">
         Secure Your Boardroom Session

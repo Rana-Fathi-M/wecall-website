@@ -25,9 +25,9 @@ export function Pricing() {
 
       if (mobile) {
         const joinedEl = node.querySelector(".pr-joined");
-        if (joinedEl) joinedEl.textContent = "23";
+        if (joinedEl) joinedEl.textContent = "2";
         const bar = node.querySelector<HTMLElement>(".pr-bar");
-        if (bar) bar.style.transform = "scaleX(0.92)";
+        if (bar) bar.style.transform = "scaleX(0.2)";
         return;
       }
 
@@ -125,7 +125,7 @@ export function Pricing() {
       const joined = { n: 0 };
       const joinedEl = node.querySelector(".pr-joined");
       gsap.to(joined, {
-        n: 23,
+        n: 2,
         duration: 1.6,
         ease: "power2.out",
         scrollTrigger: { trigger: ".pr-alloc", start: "top 85%" },
@@ -138,7 +138,7 @@ export function Pricing() {
         ".pr-bar",
         { scaleX: 0 },
         {
-          scaleX: 0.92,
+          scaleX: 0.2,
           duration: 1.4,
           ease: "power2.out",
           scrollTrigger: { trigger: ".pr-alloc", start: "top 85%" },
@@ -197,7 +197,7 @@ export function Pricing() {
             </p>
             <p className="mt-2 flex items-end gap-2">
               <span className="pr-joined font-nohemi text-[48px] leading-none text-gold md:text-[64px]">0</span>
-              <span className="mb-1 font-nohemi text-[18px] text-white/50 md:text-[24px]">/ 25 seats</span>
+              <span className="mb-1 font-nohemi text-[18px] text-white/50 md:text-[24px]">/ 10 seats</span>
             </p>
           </div>
           <p className="max-w-xs font-manrope text-[13px] leading-relaxed text-white/65">
@@ -208,7 +208,7 @@ export function Pricing() {
           <div className="pr-bar h-full origin-left rounded-full bg-gradient-to-r from-brown to-gold" />
         </div>
         <p className="mt-2 font-manrope text-[11px] tracking-widest text-gold/80 uppercase">
-          92% allocated
+          20% allocated
         </p>
       </div>
 
@@ -257,8 +257,8 @@ export function Pricing() {
           >
             {t.featured ? (
               <div className="pr-offer">
-                <span>Save $1,000</span>
-                <em>next 3 clients</em>
+                <span>Limited discount</span>
+                <em>was $6,500 / mo</em>
               </div>
             ) : null}
             <div className="flex items-start justify-between gap-1 md:items-center md:gap-3">
@@ -276,7 +276,9 @@ export function Pricing() {
               {i < 2 ? (
                 <FlipPrice
                   value={cycle === "monthly" ? monthly[i] : annual[i]}
-                  compareAt={t.featured && cycle === "monthly" ? 6500 : undefined}
+                  compareAt={
+                    t.featured ? (cycle === "monthly" ? 6500 : 71500) : undefined
+                  }
                   suffix={cycle === "monthly" ? "/ month" : "/ year"}
                   featured={t.featured}
                 />
@@ -324,7 +326,7 @@ export function Pricing() {
 
       <div className="pr-urgency keep-dark relative z-30 mx-auto mt-10 flex max-w-2xl items-center justify-between gap-3 rounded-full border border-gold/40 bg-[#1f2329] px-3 py-2 text-white md:sticky md:bottom-5 md:px-6 md:py-2.5">
         <p className="min-w-0 font-manrope text-[11px] leading-snug md:text-[13px]">
-          $1,000 off the next 3 Upcoming Millionaire clients
+          $1,000 off Upcoming Millionaire — was $6,500 / mo
         </p>
         <ClaimSeatCta compact tight className="shrink-0" />
       </div>
@@ -367,10 +369,11 @@ function FlipPrice({
   }, [value]);
 
   return (
-    <div>
+    <div className={compareAt ? "pr-deal" : undefined}>
       {compareAt ? (
-        <p className="pr-was font-manrope text-[8px] tracking-wide text-white/45 line-through md:text-[14px]">
-          ${compareAt.toLocaleString()}
+        <p className="pr-was-row">
+          <span className="pr-was-kicker">Was</span>
+          <span className="pr-was">${compareAt.toLocaleString()}</span>
         </p>
       ) : null}
       <p className={`pr-price font-nohemi text-[16px] leading-none font-semibold md:text-[58px] ${featured ? "text-[#f6e2c8]" : "text-gold"}`}>
@@ -381,6 +384,9 @@ function FlipPrice({
           {suffix}
         </span>
       </p>
+      {compareAt && compareAt > value ? (
+        <p className="pr-save-pill">Save ${(compareAt - value).toLocaleString()}</p>
+      ) : null}
     </div>
   );
 }

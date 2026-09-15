@@ -2069,12 +2069,12 @@ html.light .ap-glow {
   justify-content: space-between;
   gap: 6px;
   margin: -2px -2px 8px;
-  padding: 6px 8px;
+  padding: 7px 9px;
   border-radius: 10px;
   background: linear-gradient(90deg, #f0d2b0, #c49e7b);
   color: #191d23;
   font-family: Manrope, sans-serif;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -2082,7 +2082,51 @@ html.light .ap-glow {
 
 .pr-offer em {
   font-style: normal;
-  opacity: 0.72;
+  font-weight: 800;
+  opacity: 0.9;
+}
+
+.pr-was-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 8px;
+  margin-bottom: 4px;
+}
+
+.pr-was-kicker {
+  font-family: Manrope, sans-serif;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #f0d2b0;
+}
+
+.pr-was {
+  font-family: Nohemi, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: rgba(255, 243, 226, 0.72);
+  text-decoration: line-through;
+  text-decoration-color: #f0d2b0;
+  text-decoration-thickness: 2px;
+}
+
+.pr-save-pill {
+  display: inline-flex;
+  margin-top: 6px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #f0d2b0;
+  font-family: Manrope, sans-serif;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #191d23;
 }
 
 .pr-featured-glow {
@@ -2250,6 +2294,22 @@ html.light .ap-glow {
   .pr-offer {
     margin: -12px -12px 14px;
     padding: 10px 14px;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+  }
+
+  .pr-was-kicker {
+    font-size: 12px;
+  }
+
+  .pr-was {
+    font-size: 28px;
+    text-decoration-thickness: 3px;
+  }
+
+  .pr-save-pill {
+    margin-top: 10px;
+    padding: 6px 12px;
     font-size: 12px;
     letter-spacing: 0.14em;
   }
@@ -4045,13 +4105,24 @@ html.light .qt-input[type="date"] {
 
   .pr-offer {
     margin: -4px -2px 6px;
-    padding: 4px 5px;
-    font-size: 6px;
+    padding: 5px 6px;
+    font-size: 8px;
     letter-spacing: 0.04em;
   }
 
+  .pr-was-kicker {
+    font-size: 8px;
+  }
+
   .pr-was {
-    font-size: 7px !important;
+    font-size: 13px !important;
+    text-decoration-thickness: 1.5px;
+  }
+
+  .pr-save-pill {
+    margin-top: 4px;
+    padding: 3px 6px;
+    font-size: 7px;
   }
 
   .pr-featured {

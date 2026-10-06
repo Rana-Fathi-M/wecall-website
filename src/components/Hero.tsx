@@ -3,8 +3,9 @@ import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { photos } from "../media";
-import { useTheme } from "../context/ThemeContext";
 import { ClaimSeatCta } from "./ClaimSeatCta";
+import { ThemePhoto } from "./ThemePhoto";
+import { scheduleRefresh } from "../lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -139,6 +140,7 @@ export function Hero() {
       scrollTl.to(".hero-img-courtyard", shotVars(".hero-img-courtyard", false, { x: "90vw", y: "120vh", duration: leaveDur, ease: "none" }), leaveAt);
       scrollTl.to(".hero-title", { y: "-34vh", duration: 0.36, ease: "none" }, leaveAt + leaveDur * 0.68);
       scrollTl.to(".hero-copy", { y: 0, opacity: 1, xPercent: -50, duration: 0.36, ease: "none" }, "<");
+      scheduleRefresh();
     }, root);
 
     return () => {
@@ -458,19 +460,10 @@ function HeroShot({
   className: string;
   priority?: boolean;
 }) {
-  const { theme } = useTheme();
-  const src = theme === "light" ? light : dark;
   return (
     <div className={className}>
       <div className="relative h-full w-full overflow-hidden">
-        <img
-          src={src}
-          alt=""
-          fetchPriority={priority ? "high" : "low"}
-          loading={priority ? "eager" : "lazy"}
-          decoding="async"
-          className="block h-full w-full object-cover"
-        />
+        <ThemePhoto light={light} dark={dark} eager={priority} className="h-full w-full object-cover" />
         <div className="absolute inset-0 bg-[#c49e7b]/18 light:bg-cream/10" />
       </div>
     </div>

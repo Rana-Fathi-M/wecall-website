@@ -4,6 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ClaimSeatCta } from "./ClaimSeatCta";
 import { ThemePhoto } from "./ThemePhoto";
 import { photos } from "../media";
+import { scheduleRefresh } from "../lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -28,11 +29,11 @@ const cases = [
     metric: "$24K",
     metricLabel: "wholesale spread in month one",
     chips: ["1 caller + 10k records", "44 pre-vetted leads", "2 assignments closed"],
-    who: "James T#####",
-    firm: "TX P######## LLC",
+    who: "James Taylor",
+    firm: "TX Properties LLC",
     market: "Dallas, TX",
-    email: "james.t@txpr########.com",
-    phone: "+1 (817) 4##-####",
+    email: "james.t@txproperties.com",
+    phone: "+1 (817) 492-8371",
     quote:
       "We were burning thousands on Upwork freelancers who couldn't handle basic seller objections. Switched to a Starter desk to feed my own pipeline. The caller is trained on the 4 pillars, and leads land in GHL with clean notes. Two wholesale deals in Tarrant County in month one — it covers its own overhead if you work the data.",
     photo: photos.deals,
@@ -47,11 +48,11 @@ const cases = [
     metric: "06",
     metricLabel: "fix-and-flip contracts in 90 days",
     chips: ["3 callers + 1 AM", "comps & offers in-house", "~$84k net in 3 months"],
-    who: "Elena C#####",
-    firm: "Suncoast C########",
+    who: "Elena Carter",
+    firm: "Suncoast Capital",
     market: "Tampa, FL",
-    email: "e.carter@sunc########.com",
-    phone: "+1 (813) 7##-####",
+    email: "e.carter@suncoastcapital.com",
+    phone: "+1 (813) 745-9210",
     quote:
       "I don't have time on the dialer or initial seller negotiations while managing rehab sites. We took a Millionaire seat so their team handles calling and our AM runs comps and offers. Six fix-and-flip properties in 90 days. Solid pipeline without micromanaging the front end.",
     photo: photos.flip,
@@ -66,11 +67,11 @@ const cases = [
     metric: "04",
     metricLabel: "closed deals every month",
     chips: ["7 callers + 2 closers", "contracts to email", "hands-off signatures"],
-    who: "Marcus V#####",
-    firm: "Midwest E########",
+    who: "Marcus Vance",
+    firm: "Midwest Equities",
     market: "Columbus, OH",
-    email: "mvance@midw########.com",
-    phone: "+1 (614) 8##-####",
+    email: "mvance@midwestequities.com",
+    phone: "+1 (614) 832-4911",
     quote:
       "We scaled to a custom desk once the script and buy-box were dialed in. Now we run 7 callers and 2 closers through them. I get a notification when a contract needs a signature. A few weeks to iron out the market data, then a steady 4 deals a month — so I could step back and scale the STR portfolio overseas.",
     photo: photos.seats,
@@ -85,17 +86,29 @@ const cases = [
     metric: "48h",
     metricLabel: "skip-trace + dialer recovery",
     chips: ["Week-one disconnects", "Moe Kotait + QA stepped in", "Flow back above benchmark"],
-    who: "Brian M#####",
-    firm: "Keystone P########",
+    who: "Brian Miller",
+    firm: "Keystone Partners",
     market: "Atlanta, GA",
-    email: "b.miller@keyst########.com",
-    phone: "+1 (404) 5##-####",
+    email: "b.miller@keystonepartners.com",
+    phone: "+1 (404) 581-2294",
     quote:
       "We had a rough first week where the local data in our target submarket underperformed. Moe and his team recleaned the lists and adjusted dialer filters. Since that bottleneck was fixed, lead quality has been solid. Good to work with an outfit that actually picks up the phone.",
     photo: photos.nightDesk,
     script: "we pick up",
   },
 ];
+
+function hashEmail(email: string) {
+  const [user = "", domain = ""] = email.split("@");
+  const dot = domain.indexOf(".");
+  const host = dot === -1 ? domain : domain.slice(0, dot);
+  const tld = dot === -1 ? "" : domain.slice(dot);
+  return `${user.slice(0, 1)}••••@${host.slice(0, 1)}••••${tld}`;
+}
+
+function hashPhone() {
+  return "+1 (•••) •••-••••";
+}
 
 export function SuccessStories() {
   const root = useRef<HTMLElement>(null);
@@ -104,7 +117,7 @@ export function SuccessStories() {
     const node = root.current;
     if (!node) return;
 
-    const films = Array.from(node.querySelectorAll<HTMLElement>(".ss-film"));
+    const films = Array.from(node.querySelectorAll<HTMLElement>(".ss-track > .ss-film"));
     const strip = node.querySelector<HTMLElement>(".ss-filmstrip");
     const track = node.querySelector<HTMLElement>(".ss-track");
     const bar = node.querySelector<HTMLElement>(".ss-scrub-bar");
@@ -114,16 +127,18 @@ export function SuccessStories() {
     const capEl = node.querySelector<HTMLElement>(".ss-rail-cap");
     const dots = Array.from(node.querySelectorAll<HTMLElement>(".ss-dot"));
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const desktop = window.matchMedia("(min-width: 768px)").matches;
+    const desktopMq = window.matchMedia("(min-width: 768px)");
+    const isDesktop = () => desktopMq.matches;
     let active = 0;
     let pinSt: ScrollTrigger | undefined;
 
     const paint = (index: number, progress = 0) => {
-      if (index !== active) {
-        active = index;
-        films.forEach((el, i) => el.classList.toggle("is-on", i === index));
-        dots.forEach((el, i) => el.classList.toggle("is-on", i === index));
-        const item = cases[index];
+      const next = ((index % cases.length) + cases.length) % cases.length;
+      if (next !== active) {
+        active = next;
+        films.forEach((el, i) => el.classList.toggle("is-on", i === next));
+        dots.forEach((el) => el.classList.toggle("is-on", Number(el.dataset.i) === next));
+        const item = cases[next];
         if (idxEl) idxEl.textContent = item.id;
         if (nameEl) nameEl.textContent = item.label;
         if (metricEl) metricEl.textContent = item.metric;
@@ -134,179 +149,191 @@ export function SuccessStories() {
 
     paint(0, 0.06);
 
-    const ctx = gsap.context(() => {
-      if (!desktop) {
-        gsap.set(".ss-sec .tr-arc", { strokeDashoffset: 55 });
-        return;
-      }
-
-      gsap.from(".ss-head-in", {
-        y: 36,
-        opacity: 0,
-        stagger: 0.08,
-        duration: 0.85,
-        ease: "power3.out",
-        scrollTrigger: { trigger: root.current, start: "top 78%" },
-      });
-
-      if (!reduce) {
-        gsap.to(".ss-script", {
-          yPercent: -18,
-          ease: "none",
-          scrollTrigger: {
-            trigger: root.current,
-            start: "top bottom",
-            end: "top top",
-            scrub: 1,
-          },
+    const slideTo = (index: number) => {
+      if (!track) return;
+      const next = ((index % cases.length) + cases.length) % cases.length;
+      const film = films[next];
+      if (!film) return;
+      const pad = Number.parseFloat(window.getComputedStyle(track).paddingLeft) || 0;
+      const wrap = active === cases.length - 1 && next === 0;
+      if (wrap) track.style.transition = "none";
+      track.style.transform = `translate3d(${-(film.offsetLeft - pad)}px,0,0)`;
+      paint(next, next / Math.max(cases.length - 1, 1));
+      if (wrap) {
+        track.offsetWidth;
+        requestAnimationFrame(() => {
+          track.style.transition = "";
         });
       }
+    };
 
-      gsap.fromTo(
-        ".ss-sec .tr-arc",
-        { strokeDashoffset: 553 },
-        {
-          strokeDashoffset: 55,
-          duration: reduce ? 0 : 1.4,
-          ease: "power2.out",
-          scrollTrigger: { trigger: ".ss-sec .tr-meter", start: "top 85%" },
-        },
-      );
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
 
-      if (reduce || !strip || !track) return;
+      mm.add("(max-width: 767px)", () => {
+        gsap.set(".ss-sec .tr-arc", { strokeDashoffset: 55 });
+      });
 
-      const getX = () => -(track.scrollWidth - strip.clientWidth);
+      mm.add("(min-width: 768px)", () => {
+        gsap.from(".ss-head-in", {
+          y: 36,
+          opacity: 0,
+          stagger: 0.08,
+          duration: 0.85,
+          ease: "power3.out",
+          scrollTrigger: { trigger: root.current, start: "top 78%" },
+        });
 
-      gsap.to(track, {
-        x: getX,
-        ease: "none",
-        scrollTrigger: {
-          trigger: ".ss-pin",
-          start: "top top",
-          end: () => `+=${Math.max(track.scrollWidth - strip.clientWidth, window.innerHeight * 1.6)}`,
-          pin: true,
-          scrub: 0.85,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            pinSt = self;
-            const i = Math.min(cases.length - 1, Math.round(self.progress * (cases.length - 1)));
-            paint(i, self.progress);
+        if (!reduce) {
+          gsap.to(".ss-script", {
+            yPercent: -18,
+            ease: "none",
+            scrollTrigger: {
+              trigger: root.current,
+              start: "top bottom",
+              end: "top top",
+              scrub: 1,
+            },
+          });
+        }
+
+        gsap.fromTo(
+          ".ss-sec .tr-arc",
+          { strokeDashoffset: 553 },
+          {
+            strokeDashoffset: 55,
+            duration: reduce ? 0 : 1.4,
+            ease: "power2.out",
+            scrollTrigger: { trigger: ".ss-sec .tr-meter", start: "top 85%" },
           },
-        },
+        );
+
+        if (reduce || !strip || !track) return;
+
+        const getX = () => -(track.scrollWidth - strip.clientWidth);
+
+        gsap.to(track, {
+          x: getX,
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".ss-pin",
+            start: "top top",
+            end: () => `+=${Math.max(track.scrollWidth - strip.clientWidth, window.innerHeight * 1.6)}`,
+            pin: true,
+            scrub: 0.85,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => {
+              pinSt = self;
+              const i = Math.min(cases.length - 1, Math.round(self.progress * (cases.length - 1)));
+              paint(i, self.progress);
+            },
+          },
+        });
       });
     }, root);
 
-    let frame = 0;
-    const onStripScroll = () => {
-      if (desktop || !strip) return;
-      if (frame) return;
-      frame = window.requestAnimationFrame(() => {
-        frame = 0;
-        const loop = track ? track.scrollWidth / 2 : strip.scrollWidth;
-        const max = Math.max(loop, 1);
-        const progress = (strip.scrollLeft % max) / max;
-        const i = Math.min(cases.length - 1, Math.round(progress * (cases.length - 1)));
-        paint(i, progress);
-      });
+    let autoTimer = 0;
+    let resumeTimer = 0;
+    let inView = false;
+    let startX = 0;
+    let io: IntersectionObserver | undefined;
+
+    const stopAuto = () => {
+      window.clearInterval(autoTimer);
+      autoTimer = 0;
+      window.clearTimeout(resumeTimer);
     };
 
-    const onDot = (event: Event) => {
+    const startAuto = () => {
+      if (isDesktop() || reduce || autoTimer) return;
+      autoTimer = window.setInterval(() => slideTo(active + 1), 3400);
+    };
+
+    const pauseAuto = () => {
+      window.clearInterval(autoTimer);
+      autoTimer = 0;
+      window.clearTimeout(resumeTimer);
+    };
+
+    const resumeAuto = () => {
+      window.clearTimeout(resumeTimer);
+      resumeTimer = window.setTimeout(() => {
+        if (inView) startAuto();
+      }, 2800);
+    };
+
+    const onDotPointer = (event: Event) => {
+      const pointer = event as PointerEvent;
+      if (typeof pointer.button === "number" && pointer.button !== 0) return;
+      event.preventDefault();
+      event.stopPropagation();
       const button = event.currentTarget as HTMLElement;
       const i = Number(button.dataset.i || 0);
-      const film = films[i];
-      if (!film || !strip) return;
-      if (desktop) {
+      if (isDesktop()) {
         if (pinSt) {
           pinSt.scroll(pinSt.start + (pinSt.end - pinSt.start) * (i / Math.max(cases.length - 1, 1)));
         }
         return;
       }
-      strip.scrollTo({ left: film.offsetLeft - 16, behavior: "smooth" });
+      pauseAuto();
+      slideTo(i);
+      resumeAuto();
     };
 
-    strip?.addEventListener("scroll", onStripScroll, { passive: true });
-    dots.forEach((dot) => dot.addEventListener("click", onDot));
-
-    let autoRaf = 0;
-    let resumeTimer = 0;
-    let paused = false;
-    const clones: HTMLElement[] = [];
-    let io: IntersectionObserver | undefined;
-    const pauseAuto = () => {
-      paused = true;
-      window.clearTimeout(resumeTimer);
-    };
-    const resumeAuto = () => {
-      window.clearTimeout(resumeTimer);
-      resumeTimer = window.setTimeout(() => {
-        paused = false;
-      }, 1600);
+    const onStripDown = (event: PointerEvent) => {
+      if (isDesktop()) return;
+      startX = event.clientX;
+      pauseAuto();
     };
 
-    const stopAuto = () => {
-      if (autoRaf) window.cancelAnimationFrame(autoRaf);
-      autoRaf = 0;
-      window.clearTimeout(resumeTimer);
+    const onStripUp = (event: PointerEvent) => {
+      if (isDesktop()) return;
+      const dx = event.clientX - startX;
+      if (dx < -40) slideTo(active + 1);
+      else if (dx > 40) slideTo(active - 1);
+      resumeAuto();
     };
 
-    if (!desktop && !reduce && strip && track) {
-      Array.from(track.children).forEach((child) => {
-        const clone = child.cloneNode(true) as HTMLElement;
-        clone.setAttribute("aria-hidden", "true");
-        clone.classList.remove("is-on");
-        track.appendChild(clone);
-        clones.push(clone);
-      });
+    dots.forEach((dot) => {
+      dot.addEventListener("pointerdown", onDotPointer);
+      dot.addEventListener("click", onDotPointer);
+    });
 
-      let running = false;
-      const tick = () => {
-        if (!running) {
-          autoRaf = 0;
-          return;
-        }
-        if (!paused) {
-          const loopAt = track.scrollWidth / 2;
-          if (loopAt > 0) {
-            strip.scrollLeft += 0.55;
-            if (strip.scrollLeft >= loopAt) strip.scrollLeft -= loopAt;
-          }
-        }
-        autoRaf = window.requestAnimationFrame(tick);
-      };
-
+    if (!isDesktop() && strip && track) {
       io = new IntersectionObserver(
         ([entry]) => {
-          running = Boolean(entry?.isIntersecting);
-          if (running && !autoRaf) autoRaf = window.requestAnimationFrame(tick);
+          inView = Boolean(entry?.isIntersecting);
+          if (inView && !reduce) startAuto();
+          else pauseAuto();
         },
-        { threshold: 0.12 },
+        { threshold: 0.25 },
       );
       io.observe(strip);
-
-      strip.addEventListener("pointerdown", pauseAuto);
-      strip.addEventListener("pointerup", resumeAuto);
+      strip.addEventListener("pointerdown", onStripDown, { passive: true });
+      strip.addEventListener("pointerup", onStripUp, { passive: true });
       strip.addEventListener("pointercancel", resumeAuto);
     }
 
-    if (desktop) requestAnimationFrame(() => ScrollTrigger.refresh());
+    if (isDesktop()) scheduleRefresh();
 
     return () => {
-      if (frame) window.cancelAnimationFrame(frame);
       stopAuto();
-      clones.forEach((el) => el.remove());
-      strip?.removeEventListener("pointerdown", pauseAuto);
-      strip?.removeEventListener("pointerup", resumeAuto);
-      strip?.removeEventListener("pointercancel", resumeAuto);
       io?.disconnect();
-      strip?.removeEventListener("scroll", onStripScroll);
-      dots.forEach((dot) => dot.removeEventListener("click", onDot));
+      strip?.removeEventListener("pointerdown", onStripDown);
+      strip?.removeEventListener("pointerup", onStripUp);
+      strip?.removeEventListener("pointercancel", resumeAuto);
+      dots.forEach((dot) => {
+        dot.removeEventListener("pointerdown", onDotPointer);
+        dot.removeEventListener("click", onDotPointer);
+      });
+      if (track && !isDesktop()) track.style.transform = "";
       ctx.revert();
     };
   }, []);
 
   return (
-    <section ref={root} id="proof" className="ss-sec keep-dark relative bg-ink text-white">
+    <section ref={root} id="proof" className="ss-sec relative bg-ink text-white">
       <div className="ss-head relative overflow-x-clip px-4 pt-12 pb-6 md:px-10 md:pt-24 md:pb-8">
         <p className="ss-script pointer-events-none absolute top-6 left-1/2 z-0 -translate-x-1/2 font-mariyam text-[22vw] leading-none text-gold/15 md:top-4 md:text-[9.5vw]">
           successes
@@ -330,7 +357,7 @@ export function SuccessStories() {
               Auto-plays · swipe anytime
             </p>
           </div>
-          <div className="ss-head-in tr-meter keep-dark mx-auto">
+          <div className="ss-head-in tr-meter mx-auto">
             <svg viewBox="0 0 200 200" aria-hidden>
               <circle className="tr-track" cx="100" cy="100" r="88" />
               <circle className="tr-arc" cx="100" cy="100" r="88" />
@@ -378,6 +405,7 @@ export function SuccessStories() {
                   type="button"
                   className={`ss-dot ${i === 0 ? "is-on" : ""}`}
                   data-i={i}
+                  tabIndex={-1}
                   aria-label={`Show ${item.label}`}
                 />
               ))}
@@ -426,7 +454,7 @@ export function SuccessStories() {
                         <em> · {item.market}</em>
                       </p>
                       <p className="ss-hash">
-                        {item.email} · {item.phone}
+                        {hashEmail(item.email)} · {hashPhone()}
                       </p>
                     </div>
                   </div>
@@ -441,12 +469,13 @@ export function SuccessStories() {
                 type="button"
                 className={`ss-dot ${i === 0 ? "is-on" : ""}`}
                 data-i={i}
+                tabIndex={-1}
                 aria-label={`Show ${item.label}`}
               />
             ))}
           </div>
         </div>
-        <div className="ss-scrub" aria-hidden>
+        <div className="ss-scrub hidden md:block" aria-hidden>
           <span className="ss-scrub-bar" />
         </div>
       </div>

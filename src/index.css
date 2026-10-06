@@ -2005,6 +2005,70 @@ html.light .ap-glow {
   background: radial-gradient(circle, rgba(58, 40, 28, 0.14), transparent 68%);
 }
 
+.hero-root {
+  height: auto;
+}
+
+.hero-pin {
+  position: relative;
+}
+
+.hero-stage {
+  position: relative;
+  height: 100svh;
+  background: #191d23;
+  contain: layout style;
+}
+
+@media (min-width: 768px) {
+  .hero-root {
+    height: 228svh;
+  }
+
+  .hero-pin {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+  }
+
+  .hero-stage {
+    position: absolute;
+    inset: 0;
+    height: 100svh;
+  }
+
+  .hero-copy {
+    position: absolute;
+    left: 50%;
+    bottom: 3rem;
+    z-index: 110;
+    transform: translateX(-50%);
+  }
+}
+
+.hero-root:not(.is-ready) .hero-img,
+.hero-root:not(.is-ready) .hero-word,
+.hero-root:not(.is-ready) .hero-script,
+.hero-root:not(.is-ready) .hero-copy {
+  opacity: 0 !important;
+  visibility: hidden;
+}
+
+.hero-img,
+.hero-word,
+.hero-script,
+.hero-copy,
+.hero-title {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+@media (min-width: 768px) {
+  .hero-img {
+    will-change: transform, opacity;
+  }
+}
+
 .hero-gap {
   height: 24px;
 }
@@ -4038,6 +4102,43 @@ html.light .qt-input[type="date"] {
 }
 
 @media (max-width: 767px) {
+  .hero-root {
+    height: 180svh;
+    contain: none;
+  }
+
+  .hero-pin {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+  }
+
+  .hero-stage {
+    position: absolute;
+    inset: 0;
+    height: 100svh;
+    overflow: hidden;
+    contain: none;
+  }
+
+  .hero-root:not(.is-ready) .hero-img,
+  .hero-root:not(.is-ready) .hero-word,
+  .hero-root:not(.is-ready) .hero-script {
+    opacity: 1 !important;
+    visibility: visible;
+  }
+
+  .hero-copy {
+    position: absolute;
+    left: 50%;
+    bottom: 1.25rem;
+    z-index: 110;
+    width: calc(100% - 1.5rem);
+    max-width: 720px;
+    padding: 0;
+    transform: translateX(-50%);
+  }
+
   .hero-collage {
     inset: auto;
     top: 50%;
@@ -4060,7 +4161,7 @@ html.light .qt-input[type="date"] {
 
   .hero-img > div {
     border: 1px solid rgba(196, 158, 123, 0.28);
-    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.42);
+    box-shadow: none;
   }
 
   .hero-img-stairs {

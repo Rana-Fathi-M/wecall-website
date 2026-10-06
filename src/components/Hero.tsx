@@ -1,239 +1,157 @@
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { photos } from "../media";
+import { useTheme } from "../context/ThemeContext";
 import { ClaimSeatCta } from "./ClaimSeatCta";
 
 gsap.registerPlugin(ScrollTrigger);
 
+function shotVars(sel: string, mobile: boolean, extra: gsap.TweenVars = {}): gsap.TweenVars {
+  if (mobile) return extra;
+  if (sel === ".hero-img-wood") return { xPercent: -50, yPercent: -50, ...extra };
+  if (sel === ".hero-img-house") return { yPercent: -50, ...extra };
+  return extra;
+}
+
 export function Hero() {
   const root = useRef<HTMLElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const node = root.current;
+    if (!node) return;
+
+    const mobile = window.matchMedia("(max-width: 767px)").matches;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const stage = node.querySelector<HTMLElement>(".hero-stage");
+
     const ctx = gsap.context(() => {
-      /*
-       * =========================================================
-       * INITIAL STATES
-       * =========================================================
-       */
+      if (mobile) {
+        node.classList.add("is-ready");
+        stage?.classList.add("is-ready");
+        gsap.set(".hero-img-wood", { xPercent: -50, yPercent: -50, x: 0, y: 0 });
+        gsap.set(".hero-img-house", { yPercent: -50, x: 0, y: 0 });
+        gsap.set(".hero-copy", { opacity: 0, y: 24, xPercent: -50 });
 
-      // ---------------------------------------------------------
-      // Main title
-      // ---------------------------------------------------------
-      const mobile = window.matchMedia("(max-width: 767px)").matches;
+        if (reduce) {
+          gsap.set(".hero-copy", { opacity: 1, y: 0, xPercent: -50 });
+          return;
+        }
 
-      gsap.set(".hero-title", {
-        zIndex: 100,
-        force3D: true,
-      });
+        const leave = { duration: 1, ease: "none" as const };
+        const scrollTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: node,
+            start: "top top",
+            end: "bottom bottom",
+            scrub: true,
+          },
+        });
 
-      gsap.set(".hero-word", {
-        opacity: 0,
-        y: 45,
-      });
+        scrollTl
+          .to(".hero-img-stairs", { ...leave, x: "-80vw", y: "-60vh" }, 0)
+          .to(".hero-img-dome", { ...leave, x: "80vw", y: "-60vh" }, 0)
+          .to(".hero-img-house", { ...leave, x: "-90vw", y: "10vh", yPercent: -50 }, 0)
+          .to(".hero-img-wood", { ...leave, x: "0vw", y: "-90vh", xPercent: -50, yPercent: -50 }, 0)
+          .to(".hero-img-lounge", { ...leave, x: "90vw", y: "50vh" }, 0)
+          .to(".hero-img-courtyard", { ...leave, x: "70vw", y: "90vh" }, 0)
+          .to(".hero-title", { y: "-16vh", duration: 0.32, ease: "none" }, 0.58)
+          .to(".hero-copy", { y: 0, opacity: 1, xPercent: -50, duration: 0.32, ease: "none" }, "<");
+        return;
+      }
+      gsap.set(".hero-title", { zIndex: 100, force3D: true });
+      gsap.set(".hero-word", { opacity: 0, y: 45 });
+      gsap.set(".hero-script", { opacity: 0, y: 30 });
+      gsap.set(".hero-copy", { opacity: 0, y: 72, xPercent: -50, force3D: true });
 
-      gsap.set(".hero-script", {
-        opacity: 0,
-        y: 30,
-      });
-
-      // ---------------------------------------------------------
-      // Secondary content
-      //
-      // IMPORTANT:
-      // It starts BELOW the viewport so it can never overlap
-      // the main title during the first part of the animation.
-      // ---------------------------------------------------------
-      gsap.set(".hero-copy", {
-        opacity: 0,
-        y: mobile ? 28 : 72,
-        force3D: true,
-      });
-
-      /*
-       * Refresh assemble — each card slides in from its own side
-       * and settles into the collage (WHOLEDESIGN opening).
-       */
-      const assemble = mobile
-        ? [
-            { sel: ".hero-img-stairs", x: -36, y: -40, rest: 0 },
-            { sel: ".hero-img-dome", x: 48, y: -36, rest: 0 },
-            { sel: ".hero-img-house", x: -52, y: 24, rest: 0 },
-            { sel: ".hero-img-wood", x: 8, y: -44, rest: 0 },
-            { sel: ".hero-img-lounge", x: 44, y: 32, rest: 0 },
-            { sel: ".hero-img-courtyard", x: -28, y: 40, rest: 0 },
-          ]
-        : [
-            { sel: ".hero-img-stairs", x: -140, y: -110, rest: 0 },
-            { sel: ".hero-img-dome", x: 150, y: -90, rest: 0 },
-            { sel: ".hero-img-house", x: -170, y: 70, rest: 0 },
-            { sel: ".hero-img-wood", x: 20, y: -150, rest: 0 },
-            { sel: ".hero-img-lounge", x: 160, y: 90, rest: 0 },
-            { sel: ".hero-img-courtyard", x: 110, y: 140, rest: 0 },
-          ];
+      const assemble = [
+        { sel: ".hero-img-stairs", x: -140, y: -110 },
+        { sel: ".hero-img-dome", x: 150, y: -90 },
+        { sel: ".hero-img-house", x: -170, y: 70 },
+        { sel: ".hero-img-wood", x: 20, y: -150 },
+        { sel: ".hero-img-lounge", x: 160, y: 90 },
+        { sel: ".hero-img-courtyard", x: 110, y: 140 },
+      ];
 
       assemble.forEach(({ sel, x, y }) => {
-        gsap.set(sel, {
-          x,
-          y,
-          opacity: 0,
-          scale: mobile ? 1.06 : 1.12,
-          rotation: x > 0 ? 8 : -8,
-        });
+        gsap.set(
+          sel,
+          shotVars(sel, false, {
+            x,
+            y,
+            opacity: 0,
+            scale: reduce ? 1 : 1.12,
+            rotation: reduce ? 0 : x > 0 ? 8 : -8,
+            force3D: true,
+          }),
+        );
       });
+
+      node.classList.add("is-ready");
+      stage?.classList.add("is-ready");
 
       const intro = gsap.timeline({
-        defaults: {
-          ease: "power3.out",
-        },
+        defaults: { ease: "power3.out" },
       });
 
-      assemble.forEach(({ sel, rest }, i) => {
+      if (reduce) {
+        intro.set(".hero-img, .hero-word, .hero-script, .hero-copy", { opacity: 1, x: 0, y: 0, scale: 1, rotation: 0 });
+        return;
+      }
+
+      assemble.forEach(({ sel }, i) => {
         intro.to(
           sel,
-          {
+          shotVars(sel, false, {
             x: 0,
             y: 0,
             opacity: 1,
             scale: 1,
-            rotation: rest,
-            duration: 1.35,
-          },
-          i * 0.13,
+            rotation: 0,
+            duration: 1.2,
+          }),
+          i * 0.1,
         );
       });
-
       intro
-        .to(
-          ".hero-word",
-          {
-            opacity: 1,
-            y: 0,
-            duration: 1.15,
-            ease: "power3.out",
-          },
-          1.05,
-        )
-        .to(
-          ".hero-script",
-          {
-            opacity: 1,
-            y: 0,
-            duration: 1.05,
-            ease: "power3.out",
-          },
-          1.28,
-        );
+        .to(".hero-word", { opacity: 1, y: 0, duration: 1.05 }, 0.9)
+        .to(".hero-script", { opacity: 1, y: 0, duration: 0.95 }, 1.08);
 
-      /*
-       * =========================================================
-       * SCROLL TIMELINE
-       * =========================================================
-       *
-       * SECTION:
-       *
-       * 1. Hold complete composition
-       * 2. Images move out
-       * 3. Title stays alone
-       * 4. Title moves UP
-       * 5. H2/content comes UP from below
-       * 6. Hold content
-       * 7. Next section
-       * =========================================================
-       */
-
-      const leaveDur = mobile ? 0.7 : 2.2;
-      const leave = {
-        scale: 1,
-        ease: "none" as const,
-        duration: leaveDur,
-      };
-
-      const stage = root.current?.querySelector(".hero-stage");
-
+      const leaveDur = 2.2;
+      const leaveAt = 0.1;
       const scrollTl = gsap.timeline({
         scrollTrigger: {
-          trigger: stage,
+          trigger: node,
           start: "top top",
-          end: mobile ? "+=28%" : "+=128%",
-          pin: true,
-          scrub: mobile ? 0.16 : 0.16,
-          anticipatePin: 1,
+          end: "bottom bottom",
+          scrub: 0.16,
           invalidateOnRefresh: true,
         },
       });
 
-      /*
-       * Images leave fully, then WeCall / Investments lifts right away.
-       */
-      scrollTl.to({}, { duration: mobile ? 0.03 : 0.08 });
-
-      const leaveAt = mobile ? 0.04 : 0.1;
-
-      scrollTl.to(
-        ".hero-img-stairs",
-        { ...leave, x: "-110vw", y: "-90vh" },
-        leaveAt,
-      );
-      scrollTl.to(
-        ".hero-img-dome",
-        { ...leave, x: "110vw", y: "-90vh" },
-        leaveAt,
-      );
-      scrollTl.to(
-        ".hero-img-house",
-        { ...leave, x: "-120vw", y: "8vh" },
-        leaveAt,
-      );
-      scrollTl.to(
-        ".hero-img-wood",
-        { ...leave, x: "0vw", y: "-120vh" },
-        leaveAt,
-      );
-      scrollTl.to(
-        ".hero-img-lounge",
-        { ...leave, x: "120vw", y: "70vh" },
-        leaveAt,
-      );
-      scrollTl.to(
-        ".hero-img-courtyard",
-        { ...leave, x: "90vw", y: "120vh" },
-        leaveAt,
-      );
-
-      scrollTl.to(
-        ".hero-title",
-        {
-          y: mobile ? "-18vh" : "-34vh",
-          duration: mobile ? 0.28 : 0.36,
-          ease: "none",
-        },
-        leaveAt + leaveDur * 0.68,
-      );
-
-      scrollTl.to(
-        ".hero-copy",
-        {
-          y: 0,
-          opacity: 1,
-          duration: mobile ? 0.28 : 0.36,
-          ease: "none",
-        },
-        "<",
-      );
-
-      requestAnimationFrame(() => ScrollTrigger.refresh());
+      scrollTl.to({}, { duration: 0.08 });
+      scrollTl.to(".hero-img-stairs", shotVars(".hero-img-stairs", false, { x: "-110vw", y: "-90vh", duration: leaveDur, ease: "none" }), leaveAt);
+      scrollTl.to(".hero-img-dome", shotVars(".hero-img-dome", false, { x: "110vw", y: "-90vh", duration: leaveDur, ease: "none" }), leaveAt);
+      scrollTl.to(".hero-img-house", shotVars(".hero-img-house", false, { x: "-120vw", y: "8vh", duration: leaveDur, ease: "none" }), leaveAt);
+      scrollTl.to(".hero-img-wood", shotVars(".hero-img-wood", false, { x: "0vw", y: "-120vh", duration: leaveDur, ease: "none" }), leaveAt);
+      scrollTl.to(".hero-img-lounge", shotVars(".hero-img-lounge", false, { x: "120vw", y: "70vh", duration: leaveDur, ease: "none" }), leaveAt);
+      scrollTl.to(".hero-img-courtyard", shotVars(".hero-img-courtyard", false, { x: "90vw", y: "120vh", duration: leaveDur, ease: "none" }), leaveAt);
+      scrollTl.to(".hero-title", { y: "-34vh", duration: 0.36, ease: "none" }, leaveAt + leaveDur * 0.68);
+      scrollTl.to(".hero-copy", { y: 0, opacity: 1, xPercent: -50, duration: 0.36, ease: "none" }, "<");
     }, root);
 
     return () => {
+      node.classList.remove("is-ready");
+      stage?.classList.remove("is-ready");
       ctx.revert();
     };
   }, []);
 
   return (
-    <section ref={root} className="relative">
-      <div className="hero-stage relative h-screen w-full overflow-hidden">
+    <section ref={root} className="hero-root relative">
+      <div className="hero-pin">
+      <div className="hero-stage relative w-full overflow-hidden">
         <div
           className="
             relative
@@ -266,6 +184,7 @@ export function Hero() {
             =================================================== */}
 
             <HeroShot
+              priority
               light={photos.nightDesk.light}
               dark={photos.nightDesk.dark}
               className="
@@ -310,6 +229,7 @@ export function Hero() {
             =================================================== */}
 
             <HeroShot
+              priority
               light={photos.desks.light}
               dark={photos.desks.dark}
               className="
@@ -452,30 +372,16 @@ export function Hero() {
               Investments
             </p>
           </div>
-
-          {/* =====================================================
-              SECONDARY CONTENT
-              
-              Starts BELOW the viewport.
-              
-              It does NOT sit behind/on top of the title.
-              
-              It enters only after the title has moved upward.
-          ===================================================== */}
+        </div>
+      </div>
 
           <div
             className="
               hero-copy
-              absolute
-              left-1/2
-              top-auto
-              bottom-10
               z-[110]
               w-[calc(100%-1.5rem)]
               max-w-[720px]
-              -translate-x-1/2
               text-center
-              md:bottom-12
               md:w-[calc(100%-3rem)]
             "
           >
@@ -531,7 +437,6 @@ export function Hero() {
               </div>
             </div>
           </div>
-        </div>
       </div>
       <div className="hero-gap" aria-hidden />
     </section>
@@ -546,16 +451,26 @@ function HeroShot({
   light,
   dark,
   className,
+  priority,
 }: {
   light: string;
   dark: string;
   className: string;
+  priority?: boolean;
 }) {
+  const { theme } = useTheme();
+  const src = theme === "light" ? light : dark;
   return (
     <div className={className}>
       <div className="relative h-full w-full overflow-hidden">
-        <img src={dark} alt="" className="block h-full w-full object-cover light:hidden" />
-        <img src={light} alt="" className="hidden h-full w-full object-cover light:block" />
+        <img
+          src={src}
+          alt=""
+          fetchPriority={priority ? "high" : "low"}
+          loading={priority ? "eager" : "lazy"}
+          decoding="async"
+          className="block h-full w-full object-cover"
+        />
         <div className="absolute inset-0 bg-[#c49e7b]/18 light:bg-cream/10" />
       </div>
     </div>

@@ -107,7 +107,7 @@ export function Footer() {
       </div>
 
       <div className="ft-legal mx-auto mt-8 grid max-w-5xl grid-cols-2 items-center gap-3 border-t border-white/10 pt-5 font-manrope text-[10px] tracking-widest text-white/40 uppercase md:mt-16 md:flex md:justify-between md:pt-6 md:text-[11px]">
-        <span className="text-left">© {new Date().getFullYear()} WeCall.com</span>
+        <span className="text-left">© {new Date().getFullYear()} WeCall247.com</span>
         <Link
           to="/terms"
           className="text-right transition-colors hover:text-gold"

@@ -6,6 +6,7 @@ import { Menu } from "./Menu";
 import { Footer } from "./Footer";
 import { scrollToTop } from "../lib/smoothScroll";
 import { scheduleRefresh, watchInfiniteAnimations } from "../lib/motion";
+import { applyPageMeta } from "../lib/seo";
 
 export function Layout() {
   const [menu, setMenu] = useState(false);
@@ -34,6 +35,8 @@ export function Layout() {
   }, [location.pathname, location.key]);
 
   useEffect(() => watchInfiniteAnimations(document), [location.pathname]);
+
+  useEffect(() => applyPageMeta(location.pathname), [location.pathname]);
 
   useEffect(() => {
     const onNavClick = (event: MouseEvent) => {

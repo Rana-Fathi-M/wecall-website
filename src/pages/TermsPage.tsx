@@ -13,7 +13,7 @@ const sections = [
     n: "01",
     title: "Who these terms cover",
     body: [
-      "These Terms & Conditions (“Terms”) govern access to WeCall.com and any application, strategy session, or turnkey offshore acquisition desk we discuss or deliver.",
+      "These Terms & Conditions (“Terms”) govern access to WeCall247.com and any application, strategy session, or turnkey offshore acquisition desk we discuss or deliver.",
       "By using this site, submitting a booking, or starting a desk engagement, you agree to these Terms. If you do not agree, do not use the site or send an application.",
     ],
   },
@@ -82,7 +82,7 @@ const sections = [
       "Governing law: The laws applicable to WeCall’s operating entity, without regard to conflict-of-law rules. Courts of competent jurisdiction there have exclusive venue, unless a consumer statute requires otherwise.",
       "Contact Email: admin@wecall247.com",
       "Contact Phone: (332) 244-7472",
-      "Website: https://wecall.com",
+      "Website: https://www.wecall247.com",
       "Service: Lead generation and turnkey offshore acquisition desks for U.S. real estate investors",
     ],
   },
@@ -192,7 +192,7 @@ export function TermsPage() {
             </article>
           ))}
           <p className="pt-4 text-center font-manrope text-[13px] text-white/50">
-            © 2026 WeCall.com. All Rights Reserved.
+            © 2026 WeCall247.com. All Rights Reserved.
           </p>
         </div>
       </section>
